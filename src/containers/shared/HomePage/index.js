@@ -12,14 +12,21 @@ import { Header, TabbedMenu, Card, ListItem } from "../../../components";
 import PageStyle from "./styles";
 import { DrawerActions } from "react-navigation";
 import * as actions from "../../../actions";
+import { Permissions, Notifications } from 'expo';
+
 
 class HomePage extends Component {
   state = {
-    currentVenues: []
+    currentVenues: [],
+    notification: {}
   };
+
+
 
   async componentWillMount() {
     try {
+      this.registerForPushNotificationsAsync();
+      this.notificationSubscription = Notifications.addListener(this.handleNotification);
       const { navigation } = this.props;
       const token = await AsyncStorage.getItem('token');
       if (token !== null) {
@@ -35,6 +42,10 @@ class HomePage extends Component {
     }
   }
 
+
+  handleNotification = (notification) => {
+    this.setState({ notification: notification });
+  };
   // renderCategories() {
   //   const { meetings } = this.props;
   //   console.log(meetings);
@@ -49,6 +60,33 @@ class HomePage extends Component {
 
   //   // return category;
   // }
+
+  async registerForPushNotificationsAsync() {
+    const { status: existingStatus } = await Permissions.getAsync(
+      Permissions.NOTIFICATIONS
+    );
+
+    let finalStatus = existingStatus;
+
+    // only ask if permissions have not already been determined, because
+    // iOS won't necessarily prompt the user a second time.
+    if (existingStatus !== 'granted') {
+      // Android remote notification permissions are granted during the app
+      // install, so this will only ask on iOS
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+
+    // Stop here if the user did not grant permissions
+    if (finalStatus !== 'granted') {
+      return;
+    }
+
+    // Get the token that uniquely identifies this device
+    let token = await Notifications.getExpoPushTokenAsync();
+    console.log("TOKEN FOR PUSH", token);
+
+  }
 
   renderMeetings() {
     const { navigation, meetings } = this.props;
