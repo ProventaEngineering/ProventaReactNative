@@ -97,6 +97,7 @@ class MeetingPage extends Component {
 
   renderExpectations() {
     const { expectations } = this.props;
+    // console.log(">>>>>>>>>>>>>>>", mainmeeting);
     const expectation = expectations.map(
       ({ id, image, title, description }) => {
         return (
@@ -265,10 +266,10 @@ class MeetingPage extends Component {
   }
 }
 
-const mapStatetoProps = ({ meeting, auth }) => {
+const mapStatetoProps = ({ meetingsState, auth }) => {
   const { mainmeeting, venues, expectations, facilitators,
     hasLoadedMainMeeting, hasLoadedVenues, hasLoadedExpectations, hasLoadedFacilitators
-  } = meeting;
+  } = meetingsState;
 
   const { status, token } = auth;
   return {

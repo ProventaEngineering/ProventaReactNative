@@ -32,10 +32,11 @@ class HomePage extends Component {
       if (token !== null) {
         navigation.navigate("MeetingPage", { meetingId: 35, status: "loggedin" });
       }
-      this.props.fetchMainMeeting(35, "loggedout");
-      this.props.fetchMainVenue(35, "loggedout");
       this.props.fetchMeetings("loggedout");
-      this.props.fetchFacilitators(35, "loggedout");
+      // this.props.fetchMainMeeting(35, "loggedout");
+      // this.props.fetchMainVenue(35, "loggedout");
+      //
+      // this.props.fetchFacilitators(35, "loggedout");
 
     } catch (error) {
       // Error retrieving data
@@ -108,7 +109,7 @@ class HomePage extends Component {
               <Text style={PageStyle.eventDescription}>
                 {attributes.title}
               </Text>
-              <Text style={PageStyle.eventDate}> {attributes.date} | {attributes.venues[0].title}</Text>
+              <Text style={PageStyle.eventDate}> {attributes.date} | { this.renderVenue(attributes.venues[0]) }</Text>
               <View style={PageStyle.eventBorder} />
             </Card>
           </ListItem>
@@ -118,15 +119,8 @@ class HomePage extends Component {
     return meeting;
   }
 
-  renderVenue() {
-    const { venues, hasLoadedVenues } = this.props;
-    if (hasLoadedVenues) {
-      const venue = venues.map(({ id, title }) => {
-        return <Text key={id}>{title} </Text>;
-      });
-
-      return venue;
-    }
+  renderVenue(venue) {
+      return <Text key={venue.id}>{venue.title} </Text>;
   }
 
 
@@ -134,8 +128,7 @@ class HomePage extends Component {
   render() {
     const {
       navigation,
-      mainmeeting,
-      hasLoadedMainMeeting,
+      meetings  ,
       hasLoadedMeetings,
     } = this.props;
     return (
@@ -146,20 +139,20 @@ class HomePage extends Component {
             navigation.dispatch(DrawerActions.openDrawer());
           }}
         />
-        {hasLoadedMainMeeting && hasLoadedMeetings ? (
+        {hasLoadedMeetings ? (
           <ScrollView>
-            <ListItem onPress={() => navigation.navigate("MeetingPage", { meetingId: 35, status: "loggedout" })}>
+            <ListItem onPress={() => navigation.navigate("MeetingPage", { meetingId: meetings[0].attributes, status: "loggedout" })}>
               <Card>
                 <Image
                   style={PageStyle.image}
                   source={{
-                    uri: mainmeeting.image.url
+                    uri: meetings[0].attributes.image.url
                   }}
                 />
                 <View style={PageStyle.info}>
-                  <Text style={PageStyle.description}>{mainmeeting.title}</Text>
+                  <Text style={PageStyle.description}>{meetings[0].attributes.title}</Text>
                   <Text style={PageStyle.date}>
-                    {mainmeeting.date} | {this.renderVenue()}
+                    {meetings[0].attributes.date} | {this.renderVenue(meetings[0].attributes.venues[0])}
                   </Text>
                 </View>
               </Card>
@@ -173,7 +166,7 @@ class HomePage extends Component {
           </ScrollView>
         ) : (
             <View style={PageStyle.loading}>
-              <ActivityIndicator loaded={hasLoadedMainMeeting} size="large" />
+              <ActivityIndicator loaded={hasLoadedMeetings} size="large" />
             </View>
           )}
         <TabbedMenu navigation={navigation} />
@@ -182,26 +175,23 @@ class HomePage extends Component {
   }
 }
 
-const mapStatetoProps = ({ meeting, auth }) => {
+const mapStatetoProps = ({ meetingsState, auth }) => {
   const {
-    mainmeeting,
-    hasLoadedMainMeeting,
-    venues,
-    hasLoadedVenues,
+    // hasLoadedMainMeeting,
+    // venues,
+    // hasLoadedVenues,
     meetings,
     hasLoadedMeetings,
-    hasLoadedExpectations
-  } = meeting;
-
+    // hasLoadedExpectations
+  } = meetingsState;
   const { status, token } = auth;
   return {
-    mainmeeting,
-    hasLoadedMainMeeting,
-    venues,
-    hasLoadedVenues,
+    // hasLoadedMainMeeting,
+    // venues,
+    // hasLoadedVenues,
     meetings,
     hasLoadedMeetings,
-    hasLoadedExpectations,
+    // hasLoadedExpectations,
     status,
     token
   };
