@@ -63,7 +63,7 @@ export const fetchMainMeeting = (id, status, token) => async dispatch => {
     });
     dispatch({
       type: FETCH_MAIN_MEETING,
-      payload: status === "loggedin" ? request.data.data.attributes : request.data.data[0].attributes
+      payload: request.data.data.attributes
     });
   } catch (error) {
     console.log(error);
@@ -85,7 +85,7 @@ export const fetchMainVenue = (id, status, token) => async dispatch => {
     });
     dispatch({
       type: FETCH_MAIN_VENUE,
-      payload: status === "loggedin" ? request.data.data.attributes.venues : request.data.data[0].attributes.venues
+      payload: request.data.data.attributes.venues
     });
   } catch (error) {
     console.log(error);
@@ -103,7 +103,7 @@ export const fetchExpectations = (id, status, token) => async dispatch => {
     );
     dispatch({
       type: FETCH_MAIN_EXPECTATIONS,
-      payload: status === "loggedin" ? request.data.data.attributes.expectations : request.data.data[0].attributes.expectations
+      payload: request.data.data.attributes.expectations
     });
   } catch (error) {
     console.log(error);
@@ -119,7 +119,7 @@ export const fetchFacilitators = (id, status, token) => async dispatch => {
     );
     dispatch({
       type: FETCH_MAIN_FACILITATORS,
-      payload: status === "loggedin" ? request.data.data.attributes.facilitators : request.data.data[0].attributes.facilitators
+      payload: request.data.data.attributes.facilitators
     });
   } catch (error) {
     console.log(error);

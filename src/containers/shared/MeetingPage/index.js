@@ -15,7 +15,6 @@ import { DrawerActions } from "react-navigation";
 import {
   fetchMainMeeting,
   fetchMainVenue,
-  fetchExpectations,
   fetchFacilitators
 } from "../../../actions";
 
@@ -37,7 +36,7 @@ class MeetingPage extends Component {
     } else {
       this.props.fetchMainMeeting(id, "loggedout", null);
       this.props.fetchMainVenue(id, "loggedout", null);
-      this.props.fetchExpectations(id, "loggedout", null);
+      // this.props.fetchExpectations(id, "loggedout", null);
       this.props.fetchFacilitators(id, "loggedout", null);
     }
   }
@@ -96,9 +95,8 @@ class MeetingPage extends Component {
   }
 
   renderExpectations() {
-    const { expectations } = this.props;
-    // console.log(">>>>>>>>>>>>>>>", mainmeeting);
-    const expectation = expectations.map(
+    const { mainmeeting } = this.props;
+    const expectation = mainmeeting.expectations.map(
       ({ id, image, title, description }) => {
         return (
           <View key={id} style={PageStyle.expectationContainer}>
@@ -216,10 +214,10 @@ class MeetingPage extends Component {
   }
 
   hasFetchedAll() {
-    const { hasLoadedMainMeeting, hasLoadedVenues, hasLoadedExpectations, hasLoadedFacilitators } = this.props;
+    const { hasLoadedMainMeeting, hasLoadedVenues, hasLoadedFacilitators } = this.props;
 
     return (
-      hasLoadedMainMeeting && hasLoadedVenues && hasLoadedExpectations && hasLoadedFacilitators
+      hasLoadedMainMeeting && hasLoadedVenues && hasLoadedFacilitators
     );
   }
 
@@ -268,16 +266,16 @@ class MeetingPage extends Component {
 
 const mapStatetoProps = ({ meetingsState, auth }) => {
   const { mainmeeting, venues, expectations, facilitators,
-    hasLoadedMainMeeting, hasLoadedVenues, hasLoadedExpectations, hasLoadedFacilitators
+    hasLoadedMainMeeting, hasLoadedVenues, hasLoadedFacilitators
   } = meetingsState;
 
   const { status, token } = auth;
   return {
     mainmeeting, venues, expectations, facilitators,
-    hasLoadedMainMeeting, hasLoadedVenues, hasLoadedExpectations, hasLoadedFacilitators, status, token
+    hasLoadedMainMeeting, hasLoadedVenues, hasLoadedFacilitators, status, token
   };
 };
 export default connect(
   mapStatetoProps,
-  { fetchMainMeeting, fetchMainVenue, fetchExpectations, fetchFacilitators }
+  { fetchMainMeeting, fetchMainVenue, fetchFacilitators }
 )(MeetingPage);
