@@ -35,8 +35,6 @@ class MeetingPage extends Component {
       this.props.fetchFacilitators(35, status, token);
     } else {
       this.props.fetchMainMeeting(id, "loggedout", null);
-      this.props.fetchMainVenue(id, "loggedout", null);
-      // this.props.fetchExpectations(id, "loggedout", null);
       this.props.fetchFacilitators(id, "loggedout", null);
     }
   }
@@ -46,18 +44,17 @@ class MeetingPage extends Component {
     const { mainmeeting } = this.props;
     return (
       <Card>
-        {this.renderMeetingPicture()}
+        {this.renderMeetingPicture(mainmeeting.venues)}
         <View style={PageStyle.info}>
           <Text style={PageStyle.description}>{mainmeeting.title}</Text>
           <Text style={PageStyle.date}>{mainmeeting.date}</Text>
-          <Text style={PageStyle.area}> {this.renderVenue()}</Text>
+          <Text style={PageStyle.area}> { this.renderVenue(mainmeeting.venues) }</Text>
         </View>
       </Card>
     );
   }
 
-  renderVenue() {
-    const { venues } = this.props;
+  renderVenue(venues) {
     const venue = venues.map(({ id, title }) => {
       return <Text key={id}> {title} </Text>;
     });
@@ -65,8 +62,7 @@ class MeetingPage extends Component {
     return venue;
   }
 
-  renderMeetingPicture() {
-    const { venues } = this.props;
+  renderMeetingPicture(venues) {
     const venue = venues.map(({ image, id }) => {
       return <Image key={id} style={PageStyle.image} source={image} />;
     });
@@ -185,8 +181,7 @@ class MeetingPage extends Component {
     }
   }
 
-  renderMap() {
-    const { venues } = this.props;
+  renderMap(venues) {
     const venue = venues.map(({ title, latitude, longitude, id }) => {
       return (
         <Map key={id} latitude={latitude} longitude={longitude} title={title} />
@@ -197,7 +192,7 @@ class MeetingPage extends Component {
   }
 
   renderDetails() {
-    const { navigation } = this.props;
+    const { navigation, mainmeeting } = this.props;
     const status = navigation.getParam("status");
 
     if (status !== "loggedin")
@@ -208,21 +203,21 @@ class MeetingPage extends Component {
           <Text style={[PageStyle.header, PageStyle.mapContainer]}>VENUE</Text>
           {/* For refactoring, must be inside Card */}
           <View style={PageStyle.mapContainer} />
-          <Card>{this.renderMap()}</Card>
+          <Card>{this.renderMap(mainmeeting.venues)}</Card>
         </View>
       );
   }
 
   hasFetchedAll() {
-    const { hasLoadedMainMeeting, hasLoadedVenues, hasLoadedFacilitators } = this.props;
+    const { hasLoadedMainMeeting, hasLoadedFacilitators } = this.props;
 
     return (
-      hasLoadedMainMeeting && hasLoadedVenues && hasLoadedFacilitators
+      hasLoadedMainMeeting && hasLoadedFacilitators
     );
   }
 
   render() {
-    const { navigation, hasLoadedMainMeeting, hasLoadedVenues, hasLoadedExpectations, hasLoadedFacilitators, token } = this.props;
+    const { navigation, hasLoadedMainMeeting, hasLoadedFacilitators, token } = this.props;
     const status = navigation.getParam("status");
     return (
       <View style={PageStyle.container}>
@@ -265,17 +260,17 @@ class MeetingPage extends Component {
 }
 
 const mapStatetoProps = ({ meetingsState, auth }) => {
-  const { mainmeeting, venues, expectations, facilitators,
-    hasLoadedMainMeeting, hasLoadedVenues, hasLoadedFacilitators
+  const { mainmeeting, expectations, facilitators,
+    hasLoadedMainMeeting, hasLoadedFacilitators
   } = meetingsState;
 
   const { status, token } = auth;
   return {
-    mainmeeting, venues, expectations, facilitators,
-    hasLoadedMainMeeting, hasLoadedVenues, hasLoadedFacilitators, status, token
+    mainmeeting, expectations, facilitators,
+    hasLoadedMainMeeting, hasLoadedFacilitators, status, token
   };
 };
 export default connect(
   mapStatetoProps,
-  { fetchMainMeeting, fetchMainVenue, fetchFacilitators }
+  { fetchMainMeeting, fetchFacilitators }
 )(MeetingPage);

@@ -109,7 +109,7 @@ class HomePage extends Component {
               <Text style={PageStyle.eventDescription}>
                 {attributes.title}
               </Text>
-              <Text style={PageStyle.eventDate}> {attributes.date} | { this.renderVenue(attributes.venues[0]) }</Text>
+              <Text style={PageStyle.eventDate}> {attributes.date} | { this.renderVenue(attributes.venues) }</Text>
               <View style={PageStyle.eventBorder} />
             </Card>
           </ListItem>
@@ -119,11 +119,14 @@ class HomePage extends Component {
     return meeting;
   }
 
-  renderVenue(venue) {
-      return <Text key={venue.id}>{venue.title} </Text>;
+
+  renderVenue(venues) {
+      const venue = venues.map(({ id, title }) => {
+          return <Text key={id}> {title} </Text>;
+      });
+
+      return venue;
   }
-
-
 
   render() {
     const {
@@ -152,7 +155,7 @@ class HomePage extends Component {
                 <View style={PageStyle.info}>
                   <Text style={PageStyle.description}>{meetings[0].attributes.title}</Text>
                   <Text style={PageStyle.date}>
-                    {meetings[0].attributes.date} | {this.renderVenue(meetings[0].attributes.venues[0])}
+                    {meetings[0].attributes.date} | {this.renderVenue(meetings[0].attributes.venues)}
                   </Text>
                 </View>
               </Card>
