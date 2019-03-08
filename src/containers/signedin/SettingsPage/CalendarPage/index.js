@@ -108,7 +108,6 @@ class CalendarPage extends Component {
   loadInitialData() {
     const { calendar } = this.props;
 
-
     const options = [...this.state.calendarItems];
     options[0].toggleStatus = calendar.calendarGoogle;
     options[1].toggleStatus = calendar.calendarIcalendar;

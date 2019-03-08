@@ -8,21 +8,26 @@ import {
 const INITIAL_STATE = {
   firstName: "",
   lastName: "",
-  emailAddress: "",
+  email: "",
   position: "",
   company: "",
   contactNumber: "",
-  linkedIn: "",
+  linkedin: "",
   message: "",
   profile: {}
 };
 
-export default function(state = INITIAL_STATE, action) {
+export default function (state = INITIAL_STATE, action) {
   switch (action.type) {
     case USER_UPDATE:
       return { ...state, [action.payload.prop]: action.payload };
     case FETCH_PROFILE:
-      return { ...state, profile: action.payload };
+      return {
+        ...state,
+        profile: {
+
+        }
+      };
     case PROFILE_UPDATE_SUCCESS:
       return { ...state, message: action.payload };
     case PROFILE_UPDATE_FAIL:

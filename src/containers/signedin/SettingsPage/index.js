@@ -82,11 +82,13 @@ class SettingsPage extends Component {
           <ListItem
             onPress={() => {
               if (name !== "LOG OUT") {
-                navigation.navigate(route, { content: name })
+                navigation.navigate(route, { meetingId: 35, content: name, status: "loggedin" })
               }
-              this.clearToken().then(() => {
-                navigation.navigate(route, { meetingId: 35, status: "loggedout" })
-              });
+              else if (name === "LOG OUT") {
+                this.clearToken().then(() => {
+                  navigation.navigate(route, { status: "loggedout" })
+                });
+              }
             }}
           >
             <View style={PageStyle.menuList}>
@@ -99,7 +101,7 @@ class SettingsPage extends Component {
             </View>
             <View style={PageStyle.menuBorder} />
           </ListItem>
-        </View>
+        </View >
       );
     });
 

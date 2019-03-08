@@ -27,7 +27,7 @@ export const fetchCalendarSettings = (token, callback) => async dispatch => {
     );
     dispatch({
       type: FETCH_CALENDAR_SETTINGS,
-      payload: request.data.data.attributes
+      payload: request.data.attributes
     });
     callback();
   } catch (error) {
