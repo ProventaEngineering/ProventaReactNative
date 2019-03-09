@@ -7,7 +7,7 @@ import HistoryReducer from "./HistoryReducer";
 
 export default combineReducers({
   auth: AuthReducer,
-  user: UserReducer,
+  userState: UserReducer,
   meetingsState: MeetingReducer,
   settings: SettingsReducer,
   history: HistoryReducer

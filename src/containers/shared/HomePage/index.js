@@ -30,7 +30,9 @@ class HomePage extends Component {
       const { navigation } = this.props;
       const token = await AsyncStorage.getItem('token');
       if (token !== null) {
-        navigation.navigate("MeetingPage", { meetingId: 35, status: "loggedin" });
+        this.props.fetchProfile(token);
+        const { profile } = this.props;
+        navigation.navigate("MeetingPage", { meetingId: profile.id, status: "loggedin" });
       }
       this.props.fetchMeetings("loggedout");
 
@@ -124,6 +126,12 @@ class HomePage extends Component {
       return venue;
   }
 
+  featuredMeeting(){
+      const { meetings } = this.props;
+    //Todo: featured meeting logic
+    return meetings[0].attributes;
+  }
+
   render() {
     const {
       navigation,
@@ -140,18 +148,18 @@ class HomePage extends Component {
         />
         {hasLoadedMeetings ? (
           <ScrollView>
-            <ListItem onPress={() => navigation.navigate("MeetingPage", { meetingId: meetings[0].attributes, status: "loggedout" })}>
+            <ListItem onPress={() => navigation.navigate("MeetingPage", { meetingId: this.featuredMeeting().id, status: "loggedout" })}>
               <Card>
                 <Image
                   style={PageStyle.image}
                   source={{
-                    uri: meetings[0].attributes.image.url
+                    uri: this.featuredMeeting().image.url
                   }}
                 />
                 <View style={PageStyle.info}>
-                  <Text style={PageStyle.description}>{meetings[0].attributes.title}</Text>
+                  <Text style={PageStyle.description}>{this.featuredMeeting().title}</Text>
                   <Text style={PageStyle.date}>
-                    {meetings[0].attributes.date} | {this.renderVenue(meetings[0].attributes.venues)}
+                    {this.featuredMeeting().date} | {this.renderVenue(this.featuredMeeting().venues)}
                   </Text>
                 </View>
               </Card>
@@ -174,17 +182,19 @@ class HomePage extends Component {
   }
 }
 
-const mapStatetoProps = ({ meetingsState, auth }) => {
+const mapStatetoProps = ({ meetingsState, userState,auth }) => {
   const {
     meetings,
     hasLoadedMeetings,
   } = meetingsState;
   const { status, token } = auth;
+    const { profile } = userState;
   return {
     meetings,
     hasLoadedMeetings,
     status,
-    token
+    token,
+    profile
   };
 };
 

@@ -18,10 +18,10 @@ export const updateUser = ({ prop, value }) => {
 
 //Retrieve user profile
 export const fetchProfile = (token, callback) => async dispatch => {
-  console.log("in fetchProfile");
+  const url = `${SERVER_ADDRESS}/profile`;
   try {
     const request = axios.get(
-      `${SERVER_ADDRESS}/users/43`,
+     url,
       { "headers": { "Content-Type": "application/json", "Authorization": token } }
     )
     console.log("in fetchProfile", request.data)
