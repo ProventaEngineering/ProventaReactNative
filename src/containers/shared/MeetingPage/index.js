@@ -123,23 +123,18 @@ class MeetingPage extends Component {
     this.setState({ modalVisible: true });
   }
 
-  getIndex(id) {
-    const { facilitators } = this.props;
-    return facilitators.findIndex(facilitators => facilitators.id === id);
-  }
-
   renderFacilitators() {
-    const { facilitators } = this.props;
-    if (facilitators.length > 0) {
-      const facilitator = facilitators.map(
-        ({ id, first_name, last_name, position }) => {
+    const { mainmeeting } = this.props;
+
+      const facilitator = mainmeeting.facilitators.map(
+        ({ id, first_name, last_name, position }, index, facilitators) => {
           return (
             <View key={id} style={PageStyle.expectationContainer}>
               <ListItem
                 onPress={() => {
                   this.setState(
                     {
-                      selectedIndex: this.getIndex(id)
+                      selectedIndex: index
                     },
                     () => {
                       this.toggleModal();
@@ -169,7 +164,7 @@ class MeetingPage extends Component {
                 <View style={PageStyle.expectationBorder} />
               </ListItem>
               <ModalScreen
-                facilitator={facilitators[this.getIndex(id)]}
+                facilitator={facilitators[this.state.selectedIndex]}
                 modalVisible={this.state.modalVisible}
               />
             </View>
@@ -178,7 +173,7 @@ class MeetingPage extends Component {
       );
 
       return facilitator;
-    }
+
   }
 
   renderMap(venues) {
