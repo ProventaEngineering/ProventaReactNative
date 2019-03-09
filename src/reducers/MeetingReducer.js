@@ -2,15 +2,7 @@ import {
   FETCH_MEETINGS,
   FETCH_INBOX,
   FETCH_FILTERED_MEETINGS,
-  FETCH_MAIN_MEETING,
-  FETCH_MAIN_VENUE,
-  FETCH_MAIN_EXPECTATIONS,
-  FETCH_MAIN_FACILITATORS,
-  FETCH_MAIN_PARTICIPANTS,
-  FETCH_MAIN_SPONSORS,
-  FETCH_MAIN_FLOORPLANS,
-  FETCH_MAIN_DISCUSSIONS,
-  FETCH_MAIN_TALKS,
+  FETCH_MEETING,
   MESSAGE_UPDATE,
   MESSAGE_UPDATE_SUCCESS,
   MESSAGE_UPDATE_FAIL
@@ -35,8 +27,8 @@ const INITIAL_STATE = {
   hasLoadedDiscussions: false,
   talks: [],
   hasLoadedTalks: false,
-  mainmeeting: {},
-  hasLoadedMainMeeting: false,
+  meeting: {},
+  hasLoadedMeeting: false,
   inbox: [],
   filteredMeetings: [],
   status: "",
@@ -53,40 +45,40 @@ export default function (state = INITIAL_STATE, action) {
         meetings: action.payload,
         hasLoadedMeetings: true
       };
-    case FETCH_MAIN_MEETING:
+    case FETCH_MEETING:
       return {
         ...state,
-        mainmeeting: action.payload,
-        hasLoadedMainMeeting: true
+        meeting: action.payload,
+        hasLoadedMeeting: true
       };
-    case FETCH_MAIN_VENUE:
-      return {
-        ...state,
-        venues: action.payload,
-        hasLoadedVenues: true
-      };
-    case FETCH_MAIN_EXPECTATIONS:
-      return {
-        ...state,
-        expectations: action.payload,
-        hasLoadedExpectations: true,
-      };
-    case FETCH_MAIN_FACILITATORS:
-      return {
-        ...state,
-        facilitators: action.payload,
-        hasLoadedFacilitators: true
-      };
-    case FETCH_MAIN_PARTICIPANTS:
-      return { ...state, participants: action.payload, hasLoadedParticipants: true };
-    case FETCH_MAIN_SPONSORS:
-      return { ...state, sponsors: action.payload, hasLoadedSponsors: true };
-    case FETCH_MAIN_FLOORPLANS:
-      return { ...state, floorPlans: action.payload, hasLoadedFloorPlans: true };
-    case FETCH_MAIN_DISCUSSIONS:
-      return { ...state, discussions: action.payload, hasLoadedDiscussions: true };
-    case FETCH_MAIN_TALKS:
-      return { ...state, talks: action.payload, hasLoadedTalks: true };
+    // case FETCH_MAIN_VENUE:
+    //   return {
+    //     ...state,
+    //     venues: action.payload,
+    //     hasLoadedVenues: true
+    //   };
+    // case FETCH_MAIN_EXPECTATIONS:
+    //   return {
+    //     ...state,
+    //     expectations: action.payload,
+    //     hasLoadedExpectations: true,
+    //   };
+    // case FETCH_MAIN_FACILITATORS:
+    //   return {
+    //     ...state,
+    //     facilitators: action.payload,
+    //     hasLoadedFacilitators: true
+    //   };
+    // case FETCH_MAIN_PARTICIPANTS:
+    //   return { ...state, participants: action.payload, hasLoadedParticipants: true };
+    // case FETCH_MAIN_SPONSORS:
+    //   return { ...state, sponsors: action.payload, hasLoadedSponsors: true };
+    // case FETCH_MAIN_FLOORPLANS:
+    //   return { ...state, floorPlans: action.payload, hasLoadedFloorPlans: true };
+    // case FETCH_MAIN_DISCUSSIONS:
+    //   return { ...state, discussions: action.payload, hasLoadedDiscussions: true };
+    // case FETCH_MAIN_TALKS:
+    //   return { ...state, talks: action.payload, hasLoadedTalks: true };
     case FETCH_INBOX:
       return { ...state, emails: action.payload };
     case FETCH_FILTERED_MEETINGS:

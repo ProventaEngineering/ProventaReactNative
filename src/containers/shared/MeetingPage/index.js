@@ -13,9 +13,7 @@ import { connect } from "react-redux";
 import PageStyle from "./styles";
 import { DrawerActions } from "react-navigation";
 import {
-  fetchMainMeeting,
-  fetchMainVenue,
-  fetchFacilitators
+  fetchMeeting,
 } from "../../../actions";
 
 class MeetingPage extends Component {
@@ -34,21 +32,20 @@ class MeetingPage extends Component {
       this.props.fetchExpectations(35, status, token);
       this.props.fetchFacilitators(35, status, token);
     } else {
-      this.props.fetchMainMeeting(id, "loggedout", null);
-      this.props.fetchFacilitators(id, "loggedout", null);
+      this.props.fetchMeeting(id, "loggedout", null);
     }
   }
 
 
   renderTitle() {
-    const { mainmeeting } = this.props;
+    const { meeting } = this.props;
     return (
       <Card>
-        {this.renderMeetingPicture(mainmeeting.venues)}
+        {this.renderMeetingPicture(meeting.venues)}
         <View style={PageStyle.info}>
-          <Text style={PageStyle.description}>{mainmeeting.title}</Text>
-          <Text style={PageStyle.date}>{mainmeeting.date}</Text>
-          <Text style={PageStyle.area}> { this.renderVenue(mainmeeting.venues) }</Text>
+          <Text style={PageStyle.description}>{meeting.title}</Text>
+          <Text style={PageStyle.date}>{meeting.date}</Text>
+          <Text style={PageStyle.area}> { this.renderVenue(meeting.venues) }</Text>
         </View>
       </Card>
     );
@@ -71,28 +68,28 @@ class MeetingPage extends Component {
   }
 
   renderVideo() {
-    const { mainmeeting } = this.props;
+    const { meeting } = this.props;
     return (
       <Card>
-        <Video videoSource={mainmeeting.video} />
+        <Video videoSource={meeting.video} />
       </Card>
     );
   }
 
   renderDescription() {
-    const { mainmeeting } = this.props;
+    const { meeting } = this.props;
     return (
       <Card>
         <View style={PageStyle.textArea}>
-          <Text style={PageStyle.text}>{mainmeeting.description}</Text>
+          <Text style={PageStyle.text}>{meeting.description}</Text>
         </View>
       </Card>
     );
   }
 
   renderExpectations() {
-    const { mainmeeting } = this.props;
-    const expectation = mainmeeting.expectations.map(
+    const { meeting } = this.props;
+    const expectation = meeting.expectations.map(
       ({ id, image, title, description }) => {
         return (
           <View key={id} style={PageStyle.expectationContainer}>
@@ -124,9 +121,9 @@ class MeetingPage extends Component {
   }
 
   renderFacilitators() {
-    const { mainmeeting } = this.props;
+    const { meeting } = this.props;
 
-      const facilitator = mainmeeting.facilitators.map(
+      const facilitator = meeting.facilitators.map(
         ({ id, first_name, last_name, position }, index, facilitators) => {
           return (
             <View key={id} style={PageStyle.expectationContainer}>
@@ -187,7 +184,7 @@ class MeetingPage extends Component {
   }
 
   renderDetails() {
-    const { navigation, mainmeeting } = this.props;
+    const { navigation, meeting } = this.props;
     const status = navigation.getParam("status");
 
     if (status !== "loggedin")
@@ -198,21 +195,13 @@ class MeetingPage extends Component {
           <Text style={[PageStyle.header, PageStyle.mapContainer]}>VENUE</Text>
           {/* For refactoring, must be inside Card */}
           <View style={PageStyle.mapContainer} />
-          <Card>{this.renderMap(mainmeeting.venues)}</Card>
+          <Card>{this.renderMap(meeting.venues)}</Card>
         </View>
       );
   }
 
-  hasFetchedAll() {
-    const { hasLoadedMainMeeting, hasLoadedFacilitators } = this.props;
-
-    return (
-      hasLoadedMainMeeting && hasLoadedFacilitators
-    );
-  }
-
   render() {
-    const { navigation, hasLoadedMainMeeting, hasLoadedFacilitators, token } = this.props;
+    const { navigation, hasLoadedMeeting, token } = this.props;
     const status = navigation.getParam("status");
     return (
       <View style={PageStyle.container}>
@@ -227,7 +216,7 @@ class MeetingPage extends Component {
           }
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         />
-        {this.hasFetchedAll() ?
+        {hasLoadedMeeting ?
           <ScrollView>
             <Image
               style={PageStyle.backgroundImage}
@@ -244,7 +233,7 @@ class MeetingPage extends Component {
             </View>
           </ScrollView> :
           <View style={PageStyle.loading}>
-            <ActivityIndicator loaded={this.hasFetchedAll()} size="large" />
+            <ActivityIndicator loaded={hasLoadedMeeting} size="large" />
           </View>
         }
 
@@ -255,17 +244,16 @@ class MeetingPage extends Component {
 }
 
 const mapStatetoProps = ({ meetingsState, auth }) => {
-  const { mainmeeting, expectations, facilitators,
-    hasLoadedMainMeeting, hasLoadedFacilitators
+  const { meeting,
+    hasLoadedMeeting
   } = meetingsState;
 
   const { status, token } = auth;
   return {
-    mainmeeting, expectations, facilitators,
-    hasLoadedMainMeeting, hasLoadedFacilitators, status, token
+      meeting, hasLoadedMeeting, status, token
   };
 };
 export default connect(
   mapStatetoProps,
-  { fetchMainMeeting, fetchFacilitators }
+  { fetchMeeting }
 )(MeetingPage);

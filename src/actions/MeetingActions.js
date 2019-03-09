@@ -1,6 +1,6 @@
 import {
   FETCH_MEETINGS,
-  FETCH_MAIN_MEETING,
+  FETCH_MEETING,
   FETCH_MAIN_VENUE,
   FETCH_MAIN_EXPECTATIONS,
   FETCH_MAIN_FACILITATORS,
@@ -48,7 +48,7 @@ export const fetchMeetings = (status, token) => async dispatch => {
 };
 
 //Retrieve main meetings
-export const fetchMainMeeting = (id, status, token) => async dispatch => {
+export const fetchMeeting = (id, status, token) => async dispatch => {
   const url =
     status === "loggedin"
       ? `${SERVER_ADDRESS}/meetings/${id}`
@@ -62,7 +62,7 @@ export const fetchMainMeeting = (id, status, token) => async dispatch => {
       }
     });
     dispatch({
-      type: FETCH_MAIN_MEETING,
+      type: FETCH_MEETING,
       payload: request.data.data.attributes
     });
   } catch (error) {

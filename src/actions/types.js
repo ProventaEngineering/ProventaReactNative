@@ -55,7 +55,7 @@ export const SETTINGS_CONFIG_FAIL = "settings_config_fail";
 export const FETCH_MEETINGS = "FETCH_MEETINGS";
 
 // Get main meeting
-export const FETCH_MAIN_MEETING = "fetch_main_meeting";
+export const FETCH_MEETING = "fetch_meeting";
 export const FETCH_MAIN_VENUE = "fetch_main_venue";
 export const FETCH_MAIN_EXPECTATIONS = "fetch_main_expectations";
 export const FETCH_MAIN_FACILITATORS = "fetch_main_facilitators";

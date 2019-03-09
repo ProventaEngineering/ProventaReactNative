@@ -33,10 +33,6 @@ class HomePage extends Component {
         navigation.navigate("MeetingPage", { meetingId: 35, status: "loggedin" });
       }
       this.props.fetchMeetings("loggedout");
-      // this.props.fetchMainMeeting(35, "loggedout");
-      // this.props.fetchMainVenue(35, "loggedout");
-      //
-      // this.props.fetchFacilitators(35, "loggedout");
 
     } catch (error) {
       // Error retrieving data
@@ -180,21 +176,13 @@ class HomePage extends Component {
 
 const mapStatetoProps = ({ meetingsState, auth }) => {
   const {
-    // hasLoadedMainMeeting,
-    // venues,
-    // hasLoadedVenues,
     meetings,
     hasLoadedMeetings,
-    // hasLoadedExpectations
   } = meetingsState;
   const { status, token } = auth;
   return {
-    // hasLoadedMainMeeting,
-    // venues,
-    // hasLoadedVenues,
     meetings,
     hasLoadedMeetings,
-    // hasLoadedExpectations,
     status,
     token
   };
