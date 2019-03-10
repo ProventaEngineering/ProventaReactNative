@@ -42,10 +42,20 @@ class InformationPage extends Component {
     ]
   };
 
-
+  //  componentDidMount() {
+  //   try {
+  //     const { navigation, meetings } = this.props;
+  //     this.props.fetchProfile();
+  //   } catch (error) {
+  //     // Error retrieving data
+  //   }
+  // }
 
   renderMenu(menu) {
-    const { navigation, status } = this.props;
+    const { navigation, user, status } = this.props;
+    const meeting = user.profile;
+
+
     const menuItem = menu.map(({ id, image, label, name }) => {
       return (
         <View key={id} style={PageStyle.menuContainer}>
@@ -85,7 +95,13 @@ class InformationPage extends Component {
 
 
   render() {
-    const { navigation } = this.props;
+    const { navigation, user } = this.props;
+
+
+    // const meeting = user.profile;
+    // if(meeting != undefined){
+    //   console.log(">>>>>>>IP", meeting);
+    // }
     return (
       <View style={PageStyle.container}>
         <Header
@@ -102,30 +118,23 @@ class InformationPage extends Component {
           }}
         />
         <Card>{this.renderMenu(this.state.menu)}</Card>
-        <TabbedMenu navigation={navigation} status="loggedin" />
+        <TabbedMenu navigation={navigation} user={user} status="loggedin" />
       </View>
     );
   }
 }
-const mapStatetoProps = ({ meeting, auth }) => {
-  const { mainmeeting, venues, expectations, facilitators, participants, sponsors, floorPlans,
-    hasLoadedMainMeeting, hasLoadedVenues, hasLoadedExpectations, hasLoadedFacilitators,
-    hasLoadedParticipants, hasLoadedSponsors, hasLoadedFloorPlans
-  } = meeting;
-
-  const { status } = auth;
+const mapStatetoProps = ({ meetingsState, auth, userState }) => {
+  const { meeting,
+    hasLoadedMeeting
+  } = meetingsState;
+  const { meetings } = meetingsState;
+  const { user } = userState;
+  const { status, token } = auth;
   return {
-    mainmeeting,
-    venues,
-    expectations,
-    facilitators,
-    participants,
-    sponsors,
-    floorPlans,
-    hasLoadedMainMeeting, hasLoadedVenues, hasLoadedExpectations, hasLoadedFacilitators,
-    hasLoadedParticipants, hasLoadedSponsors, hasLoadedFloorPlans,
-    status
+    meetings, meeting, hasLoadedMeeting, status, user, token
   };
 };
-
-export default connect(mapStatetoProps, actions)(InformationPage);
+export default connect(
+  mapStatetoProps,
+  { actions }
+)(InformationPage);

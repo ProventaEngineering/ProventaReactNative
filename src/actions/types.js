@@ -28,7 +28,8 @@ export const AUTH_CHECK_STATUS = "auth_check_status";
 export const USER_UPDATE = "user_update";
 
 // Getting User Information
-export const FETCH_PROFILE = "fetch_profile";
+export const FETCH_PROFILE_REQUEST = "fetch_profile_request";
+export const FETCH_PROFILE_RESPONSE = "fetch_profile_response";
 
 // Updating User Information
 export const PROFILE_UPDATE_SUCCESS = "profile_update_success";
@@ -52,10 +53,12 @@ export const SETTINGS_CONFIG_FAIL = "settings_config_fail";
 //============================ MEETINGS ACTIONS ============================//
 
 // Getting all meetings (anonymous/signed-in)
-export const FETCH_MEETINGS = "FETCH_MEETINGS";
+export const FETCH_MEETINGS_REQUEST = "fetch_meetings_request";
+export const FETCH_MEETINGS_RESPONSE = "fetch_meetings_response";
 
 // Get main meeting
-export const FETCH_MEETING = "fetch_meeting";
+export const FETCH_MEETING_REQUEST = "fetch_meeting_request";
+export const FETCH_MEETING_RESPONSE = "fetch_meeting_response";
 export const FETCH_MAIN_VENUE = "fetch_main_venue";
 export const FETCH_MAIN_EXPECTATIONS = "fetch_main_expectations";
 export const FETCH_MAIN_FACILITATORS = "fetch_main_facilitators";

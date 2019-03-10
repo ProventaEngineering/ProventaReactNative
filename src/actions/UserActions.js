@@ -1,12 +1,14 @@
 import {
   USER_UPDATE,
-  FETCH_PROFILE,
+  FETCH_PROFILE_REQUEST,
+  FETCH_PROFILE_RESPONSE,
   PROFILE_UPDATE_SUCCESS,
   PROFILE_UPDATE_FAIL,
-  SERVER_ADDRESS
+  SERVER_ADDRESS, FETCH_MEETING
 } from "./types"
   ;
 import axios from "axios";
+import {AsyncStorage} from "react-native";
 
 //Update emailAddress and password field
 export const updateUser = ({ prop, value }) => {
@@ -17,23 +19,46 @@ export const updateUser = ({ prop, value }) => {
 };
 
 //Retrieve user profile
-export const fetchProfile = (token, callback) => async dispatch => {
-  const url = `${SERVER_ADDRESS}/profile`;
-  try {
-    const request = axios.get(
-     url,
-      { "headers": { "Content-Type": "application/json", "Authorization": token } }
-    )
-    console.log("in fetchProfile", request.data)
-    dispatch({
-      type: FETCH_PROFILE,
-      payload: request.data.data.attributes
-    });
-    callback();
-  } catch (error) {
-    console.log(error);
-  }
+
+export const fetchProfile = () => async dispatch => {
+    dispatch({type: FETCH_PROFILE_REQUEST});
+    const url = `${SERVER_ADDRESS}/profile`;
+    try {
+      const token = await AsyncStorage.getItem('token');
+        const request = await axios.get(url, {
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": token
+            }
+        });
+        const profile = await request.data;
+        dispatch({
+            type: FETCH_PROFILE_RESPONSE,
+            payload: {...profile.data.attributes, ...{"token": token}}
+        });
+    } catch (error) {
+        console.log(error);
+    }
 };
+
+// export const fetchProfile = (token) => async dispatch => {
+//   const url = `${SERVER_ADDRESS}/profile`;
+//   try {
+//     const request = await axios.get(url, {
+//         "headers": {
+//             "Content-Type": "application/json",
+//             "Authorization": token
+//         }
+//     });
+//     dispatch({
+//       type: FETCH_PROFILE,
+//       payload: request.data.data
+//     });
+//     // callback();
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 // //Create User Profile
 // export const createProfile = (form, callback) => {

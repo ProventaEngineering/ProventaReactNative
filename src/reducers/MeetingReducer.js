@@ -1,51 +1,38 @@
 import {
-  FETCH_MEETINGS,
+  FETCH_MEETINGS_REQUEST,
+  FETCH_MEETINGS_RESPONSE,
   FETCH_INBOX,
   FETCH_FILTERED_MEETINGS,
   FETCH_MEETING,
   MESSAGE_UPDATE,
   MESSAGE_UPDATE_SUCCESS,
-  MESSAGE_UPDATE_FAIL
+  MESSAGE_UPDATE_FAIL, FETCH_MEETING_REQUEST
 } from "../actions/types";
 
 const INITIAL_STATE = {
-  meetings: [],
-  hasLoadedMeetings: false,
-  venues: [],
-  hasLoadedVenues: false,
-  expectations: [],
-  hasLoadedExpectations: false,
-  facilitators: [],
-  hasLoadedFacilitators: false,
-  participants: [],
-  hasLoadedParticipants: false,
-  sponsors: [],
-  hasLoadedSponsors: false,
-  floorPlans: [],
-  hasLoadedFloorPlans: false,
-  discussions: [],
-  hasLoadedDiscussions: false,
-  talks: [],
-  hasLoadedTalks: false,
-  meeting: {},
-  hasLoadedMeeting: false,
-  inbox: [],
-  filteredMeetings: [],
-  status: "",
-  message: ""
+  meetings: {
+    hasLoadedMeetings: false,
+    items: [],
+    main: {},
+    hasLoadedMainMeeting: false
+  },
 };
 
 export default function (state = INITIAL_STATE, action) {
   switch (action.type) {
     case MESSAGE_UPDATE:
       return { ...state, [action.payload.prop]: action.payload };
-    case FETCH_MEETINGS:
+    case FETCH_MEETINGS_REQUEST:
       return {
         ...state,
-        meetings: action.payload,
-        hasLoadedMeetings: true
+        meetings: {items: [], hasLoadedMeetings: false},
       };
-    case FETCH_MEETING:
+    case FETCH_MEETINGS_RESPONSE:
+      return {
+        ...state,
+        meetings: {items: action.payload, hasLoadedMeetings: true},
+      };
+    case FETCH_MEETING_REQUEST:
       return {
         ...state,
         meeting: action.payload,

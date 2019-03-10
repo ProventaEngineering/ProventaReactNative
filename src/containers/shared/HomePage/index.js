@@ -17,8 +17,12 @@ import { Permissions, Notifications } from 'expo';
 
 class HomePage extends Component {
   state = {
-    currentVenues: [],
-    notification: {}
+    meetings: {
+      items: [],
+      isFetched: false
+    },
+    notification: {},
+    loading: true
   };
 
 
@@ -27,14 +31,12 @@ class HomePage extends Component {
     try {
       this.registerForPushNotificationsAsync();
       this.notificationSubscription = Notifications.addListener(this.handleNotification);
-      const { navigation } = this.props;
-      const token = await AsyncStorage.getItem('token');
-      if (token !== null) {
-        this.props.fetchProfile(token);
-        const { profile } = this.props;
-        navigation.navigate("MeetingPage", { meetingId: profile.id, status: "loggedin" });
-      }
-      this.props.fetchMeetings("loggedout");
+
+      //Todo: getToken
+      //Todo: getToken
+      this.props.fetchMeetings();
+
+
 
     } catch (error) {
       // Error retrieving data
@@ -89,7 +91,7 @@ class HomePage extends Component {
 
   renderMeetings() {
     const { navigation, meetings } = this.props;
-    const meeting = meetings.map(({ id, attributes }) => {
+    const meeting = meetings.items.map(({ id, attributes }) => {
       return (
         <View key={id} style={PageStyle.eventList}>
           <ListItem
@@ -129,15 +131,12 @@ class HomePage extends Component {
   featuredMeeting(){
       const { meetings } = this.props;
     //Todo: featured meeting logic
-    return meetings[0].attributes;
+    return meetings.items[0].attributes;
   }
 
   render() {
-    const {
-      navigation,
-      meetings  ,
-      hasLoadedMeetings,
-    } = this.props;
+    const { navigation, meetings } = this.props;
+    // console.log(">>>>>> meetings", meetings);
     return (
       <View style={PageStyle.container}>
         <Header
@@ -146,7 +145,7 @@ class HomePage extends Component {
             navigation.dispatch(DrawerActions.openDrawer());
           }}
         />
-        {hasLoadedMeetings ? (
+        {( meetings.hasLoadedMeetings )? (
           <ScrollView>
             <ListItem onPress={() => navigation.navigate("MeetingPage", { meetingId: this.featuredMeeting().id, status: "loggedout" })}>
               <Card>
@@ -173,32 +172,29 @@ class HomePage extends Component {
           </ScrollView>
         ) : (
             <View style={PageStyle.loading}>
-              <ActivityIndicator loaded={hasLoadedMeetings} size="large" />
+              <ActivityIndicator loaded={(!meetings.hasLoadedMeetings)} size="large" />
             </View>
           )}
-        <TabbedMenu navigation={navigation} />
+        <TabbedMenu navigation={navigation} status={this.state.status} />
       </View>
     );
   }
 }
 
-const mapStatetoProps = ({ meetingsState, userState,auth }) => {
-  const {
-    meetings,
-    hasLoadedMeetings,
-  } = meetingsState;
+const mapStateToProps = ({ meetingsState, userState, auth }) => {
+
   const { status, token } = auth;
-    const { profile } = userState;
+  const { meetings } = meetingsState;
+  const { user } = userState;
   return {
     meetings,
-    hasLoadedMeetings,
     status,
     token,
-    profile
+    user
   };
 };
 
 export default connect(
-  mapStatetoProps,
+  mapStateToProps,
   actions
 )(HomePage);

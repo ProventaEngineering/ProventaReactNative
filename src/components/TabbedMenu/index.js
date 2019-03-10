@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { View } from "react-native";
+import { View, ActivityIndicator} from "react-native";
 import ComponentStyle from "./styles";
 import { MenuButton } from "../MenuButton";
+import PageStyle from "../../containers/shared/MeetingPage/styles";
 
 class TabbedMenu extends Component {
   renderAnonymous() {
@@ -28,61 +29,74 @@ class TabbedMenu extends Component {
   }
 
   renderSignedIn() {
-    const { navigation } = this.props;
-    return (
-      <View style={ComponentStyle.container}>
-        <MenuButton
-          status="SI"
-          image={require("../../assets/proventa_logo_gray.png")}
-          label="Menu"
-          onPress={() =>
-            navigation.navigate("MeetingLoginPage", {
-              meetingId: 35,
-              status: "loggedin",
-              content: "settings"
-            })
-          }
-        />
-        <MenuButton
-          status="SI"
-          image={require("../../assets/info_button.png")}
-          label="Menu"
-          onPress={() =>
-            navigation.navigate("InformationPage", {
-              status: "loggedin"
-            })
-          }
-        />
-        <MenuButton
-          status="SI"
-          image={require("../../assets/schedule_button.png")}
-          label="Menu"
-          onPress={() =>
-            navigation.navigate("InformationDetailsPage", {
-              content: 'PERSONAL SCHEDULE',
-              status: "loggedin"
-            })
-          }
-        />
-        <MenuButton
-          status="SI"
-          image={require("../../assets/inbox_button.png")}
-          label="Menu"
-          onPress={() => navigation.navigate("InboxPage")}
-        />
-        <MenuButton
-          status="SI"
-          image={require("../../assets/checkin_button.png")}
-          label="Menu"
-          onPress={() => navigation.navigate("CheckInPage")}
-        />
-      </View>
-    );
+    const { navigation, user } = this.props;
+
+    if(user.hasProfileLoaded) {
+      const meeting = user.profile.meetings[0]
+      return (
+        <View style={ComponentStyle.container}>
+          <MenuButton
+            status="SI"
+            image={require("../../assets/proventa_logo_gray.png")}
+            label="Menu"
+            onPress={() =>
+              navigation.navigate("MeetingLoginPage", {
+                meetingId: meeting.id,
+                status: "loggedin",
+                content: "settings"
+              })
+            }
+          />
+          <MenuButton
+            status="SI"
+            image={require("../../assets/info_button.png")}
+            label="Menu"
+            onPress={() =>
+              navigation.navigate("InformationPage", {
+                status: "loggedin"
+              })
+            }
+          />
+          <MenuButton
+            status="SI"
+            image={require("../../assets/schedule_button.png")}
+            label="Menu"
+            onPress={() =>
+              navigation.navigate("InformationDetailsPage", {
+                content: 'PERSONAL SCHEDULE',
+                status: "loggedin"
+              })
+            }
+          />
+          <MenuButton
+            status="SI"
+            image={require("../../assets/inbox_button.png")}
+            label="Menu"
+            onPress={() => navigation.navigate("InboxPage")}
+          />
+          <MenuButton
+            status="SI"
+            image={require("../../assets/checkin_button.png")}
+            label="Menu"
+            onPress={() => navigation.navigate("CheckInPage")}
+          />
+        </View>
+      );
+    }else{
+      return (
+        <View style={ComponentStyle.container}>
+          <View style={PageStyle.loading}>
+            <ActivityIndicator loaded={user.hasProfileLoaded} size="large" />
+          </View>
+        </View>
+      );
+    }
+
+
   }
 
   render() {
     const { status } = this.props;
-
     if (status == "loggedin") {
       return this.renderSignedIn();
     } else return this.renderAnonymous();

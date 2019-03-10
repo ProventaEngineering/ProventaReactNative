@@ -1,5 +1,8 @@
 import {
-  FETCH_MEETINGS,
+  FETCH_MEETINGS_REQUEST,
+  FETCH_MEETINGS_RESPONSE,
+  FETCH_PROFILE_REQUEST,
+  FETCH_PROFILE_RESPONSE,
   FETCH_MEETING,
   FETCH_MAIN_VENUE,
   FETCH_MAIN_EXPECTATIONS,
@@ -19,17 +22,22 @@ import {
 
 import { AsyncStorage } from "react-native";
 import axios from "axios";
+import { UserActions } from "../actions";
 
 axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'PATCH, DELETE, POST, GET, OPTIONS';
 
 //Retrieve meetings
-export const fetchMeetings = (status, token) => async dispatch => {
-  const url =
-    status === "loggedin"
-      ? `${SERVER_ADDRESS}/meetings`
-      : `${SERVER_ADDRESS}/anonymous/meetings`;
+export const fetchMeetings = () => async dispatch => {
+  dispatch({type: FETCH_MEETINGS_REQUEST});
 
+
+  //get token then fetch meetings
   try {
+    const token = await AsyncStorage.getItem('token');
+    const url =
+      token != null
+        ? `${SERVER_ADDRESS}/meetings`
+        : `${SERVER_ADDRESS}/anonymous/meetings`;
     const request = await axios.get(
       url, {
         "headers": {
@@ -38,36 +46,64 @@ export const fetchMeetings = (status, token) => async dispatch => {
         }
       }
     );
-    dispatch({
-      type: FETCH_MEETINGS,
-      payload: request.data.data
-    });
-  } catch (error) {
-    console.log(error);
+    const meetings = await request.data;
+    dispatch({ type: FETCH_MEETINGS_RESPONSE, payload: meetings.data });
+  }catch (e) {
+
   }
+
+  // try {
+  //
+  //   const request = await axios.get(
+  //     url, {
+  //       "headers": {
+  //         "Content-Type": "application/json",
+  //         "Authorization": token
+  //       }
+  //     }
+  //   );
+  //
+  //   const meetings = await request.data;
+  //   console.log(">>>>>>>>>>>", meetings);
+  //   dispatch({
+  //     type: FETCH_MEETINGS_RESPONSE,
+  //     payload: meetings.data
+  //   });
+  // } catch (error) {
+  //   console.log(error);
+  // }
 };
 
 //Retrieve main meetings
-export const fetchMeeting = (id, status, token) => async dispatch => {
-  const url =
-    status === "loggedin"
-      ? `${SERVER_ADDRESS}/meetings/${id}`
-      : `${SERVER_ADDRESS}/anonymous/meetings/${id}`;
+export const fetchMeeting = () => async dispatch => {
 
-  try {
-    const request = await axios.get(url, {
-      "headers": {
-        "Content-Type": "application/json",
-        "Authorization": token
-      }
-    });
-    dispatch({
-      type: FETCH_MEETING,
-      payload: request.data.data.attributes
-    });
-  } catch (error) {
-    console.log(error);
+  try{
+    const token = await AsyncStorage.getItem('token');
+
+  }catch(e){
+
   }
+  // const url =
+  //   status === "loggedin"
+  //     ? `${SERVER_ADDRESS}/meetings/${id}`
+  //     : `${SERVER_ADDRESS}/anonymous/meetings/${id}`;
+  // console.log("======fetching id", id)
+  // console.log("======fetching status", status)
+  // console.log("======fetching token", token)
+  // try {
+  //   const request = await axios.get(url, {
+  //     "headers": {
+  //       "Content-Type": "application/json",
+  //       "Authorization": token
+  //     }
+  //   });
+  //   dispatch({
+  //     type: FETCH_MEETING,
+  //     payload: request.data.data.attributes
+  //   });
+  // } catch (error) {
+  //   console.log(error);
+  // }
 };
 
 //Retrieve main venue

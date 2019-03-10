@@ -13,32 +13,50 @@ import { connect } from "react-redux";
 import PageStyle from "./styles";
 import { DrawerActions } from "react-navigation";
 import {
-  fetchMeeting,
+  fetchProfile,
 } from "../../../actions";
 
 class MeetingPage extends Component {
 
   state = {
     modalVisible: false,
-    selectedIndex: 1
+    selectedIndex: 1,
+    status: "loggedout"
   };
 
-  componentDidMount() {
-    const { navigation, status, token } = this.props;
-    const id = navigation.getParam("meetingId");
-    if (status === "loggedin") {
-      this.props.fetchMainMeeting(35, status, token);
-      this.props.fetchMainVenue(35, status, token);
-      this.props.fetchExpectations(35, status, token);
-      this.props.fetchFacilitators(35, status, token);
-    } else {
-      this.props.fetchMeeting(id, "loggedout", null);
+   componentDidMount() {
+    try {
+      const { navigation, meetings } = this.props;
+      this.props.fetchProfile();
+    } catch (error) {
+      // Error retrieving data
     }
   }
+  // componentDidMount() {
+  //
+  //   try {
+  //     const { navigation, token } = this.props;
+  //     const id = navigation.getParam("meetingId");
+  //     // const token = await AsyncStorage.getItem('token');
+  //     console.log("=================status from props", status)
+  //     console.log("=================id from params", id)
+  //     console.log("=================token from props", token)
+  //     this.props.fetchMeeting(id, this.state.status, token);
+  //     // if (status === "loggedin") {
+  //     //     this.props.fetchMeeting(id, loggedin, token);
+  //     // } else {
+  //     //     this.props.fetchMeeting(id, "loggedout", null);
+  //     // }
+  //   } catch (error) {
+  //       // Error retrieving data
+  //   }
+  // }
 
 
   renderTitle() {
-    const { meeting } = this.props;
+    const { user } = this.props;
+    const meeting = user.profile.meetings[0];
+    // console.log(">>>>>>>>>>>>> ito", user.profile.meetings[0]);
     return (
       <Card>
         {this.renderMeetingPicture(meeting.venues)}
@@ -68,7 +86,9 @@ class MeetingPage extends Component {
   }
 
   renderVideo() {
-    const { meeting } = this.props;
+    const { user } = this.props;
+    const meeting  = user.profile.meetings[0];
+
     return (
       <Card>
         <Video videoSource={meeting.video} />
@@ -77,7 +97,8 @@ class MeetingPage extends Component {
   }
 
   renderDescription() {
-    const { meeting } = this.props;
+    const { user } = this.props;
+    const meeting  = user.profile.meetings[0];
     return (
       <Card>
         <View style={PageStyle.textArea}>
@@ -88,7 +109,8 @@ class MeetingPage extends Component {
   }
 
   renderExpectations() {
-    const { meeting } = this.props;
+    const { user } = this.props;
+    const meeting  = user.profile.meetings[0];
     const expectation = meeting.expectations.map(
       ({ id, image, title, description }) => {
         return (
@@ -121,53 +143,54 @@ class MeetingPage extends Component {
   }
 
   renderFacilitators() {
-    const { meeting } = this.props;
+    const { user } = this.props;
+    const meeting  = user.profile.meetings[0];
 
-      const facilitator = meeting.facilitators.map(
-        ({ id, first_name, last_name, position }, index, facilitators) => {
-          return (
-            <View key={id} style={PageStyle.expectationContainer}>
-              <ListItem
-                onPress={() => {
-                  this.setState(
-                    {
-                      selectedIndex: index
-                    },
-                    () => {
-                      this.toggleModal();
-                    }
-                  );
-                }}
-              >
-                <View style={PageStyle.expectationList}>
-                  <View style={{ width: "25%" }}>
-                    <Image
-                      style={[PageStyle.expectationIcon, PageStyle.profileIcon]}
-                      source={{
-                        uri:
-                          "https://cdn5.vectorstock.com/i/thumb-large/13/04/male-profile-picture-vector-2041304.jpg"
-                      }}
-                    />
-                  </View>
-                  <View style={{ width: "75%" }}>
-                    <Text style={PageStyle.expectationTitle}>
-                      {first_name} {last_name}
-                    </Text>
-                    <Text style={PageStyle.expectationDescription}>
-                      {position}
-                    </Text>
-                  </View>
+    const facilitator = meeting.facilitators.map(
+      ({ id, first_name, last_name, position }, index, facilitators) => {
+        return (
+          <View key={id} style={PageStyle.expectationContainer}>
+            <ListItem
+              onPress={() => {
+                this.setState(
+                  {
+                    selectedIndex: index
+                  },
+                  () => {
+                    this.toggleModal();
+                  }
+                );
+              }}
+            >
+              <View style={PageStyle.expectationList}>
+                <View style={{ width: "25%" }}>
+                  <Image
+                    style={[PageStyle.expectationIcon, PageStyle.profileIcon]}
+                    source={{
+                      uri:
+                        "https://cdn5.vectorstock.com/i/thumb-large/13/04/male-profile-picture-vector-2041304.jpg"
+                    }}
+                  />
                 </View>
-                <View style={PageStyle.expectationBorder} />
-              </ListItem>
-              <ModalScreen
-                facilitator={facilitators[this.state.selectedIndex]}
-                modalVisible={this.state.modalVisible}
-              />
-            </View>
-          );
-        }
-      );
+                <View style={{ width: "75%" }}>
+                  <Text style={PageStyle.expectationTitle}>
+                    {first_name} {last_name}
+                  </Text>
+                  <Text style={PageStyle.expectationDescription}>
+                    {position}
+                  </Text>
+                </View>
+              </View>
+              <View style={PageStyle.expectationBorder} />
+            </ListItem>
+            <ModalScreen
+              facilitator={facilitators[this.state.selectedIndex]}
+              modalVisible={this.state.modalVisible}
+            />
+          </View>
+        );
+      }
+    );
 
       return facilitator;
 
@@ -184,10 +207,9 @@ class MeetingPage extends Component {
   }
 
   renderDetails() {
-    const { navigation, meeting } = this.props;
-    const status = navigation.getParam("status");
-
-    if (status !== "loggedin")
+    const { user } = this.props;
+    const meeting  = user.profile.meetings[0];
+    if (this.state.status !== "loggedin")
       return (
         <View>
           <Text style={PageStyle.header}> FACILITATORS </Text>
@@ -201,8 +223,12 @@ class MeetingPage extends Component {
   }
 
   render() {
-    const { navigation, hasLoadedMeeting, token } = this.props;
-    const status = navigation.getParam("status");
+    const { navigation, user} = this.props;
+    const status = (user.profile.token !=null ? "loggedin" : "loggedout");
+    // if(user.profile!=undefined){
+    //   console.log("==========rendering Meeting Profile", user.profile);
+    // }
+
     return (
       <View style={PageStyle.container}>
         <Header
@@ -216,7 +242,7 @@ class MeetingPage extends Component {
           }
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         />
-        {hasLoadedMeeting ?
+        {user.hasProfileLoaded ?
           <ScrollView>
             <Image
               style={PageStyle.backgroundImage}
@@ -233,27 +259,28 @@ class MeetingPage extends Component {
             </View>
           </ScrollView> :
           <View style={PageStyle.loading}>
-            <ActivityIndicator loaded={hasLoadedMeeting} size="large" />
+            <ActivityIndicator loaded={user.hasProfileLoaded} size="large" />
           </View>
         }
 
-        <TabbedMenu status={status} navigation={navigation} />
+        <TabbedMenu status={status} user={user} navigation={navigation}/>
       </View >
     );
   }
 }
 
-const mapStatetoProps = ({ meetingsState, auth }) => {
+const mapStatetoProps = ({ meetingsState, auth, userState }) => {
   const { meeting,
     hasLoadedMeeting
   } = meetingsState;
-
+  const { meetings } = meetingsState;
+  const { user } = userState;
   const { status, token } = auth;
   return {
-      meeting, hasLoadedMeeting, status, token
+      meetings, meeting, hasLoadedMeeting, status, user, token
   };
 };
 export default connect(
   mapStatetoProps,
-  { fetchMeeting }
+  { fetchProfile }
 )(MeetingPage);
