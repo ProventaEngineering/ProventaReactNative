@@ -136,7 +136,6 @@ class HomePage extends Component {
 
   render() {
     const { navigation, meetings } = this.props;
-    // console.log(">>>>>> meetings", meetings);
     return (
       <View style={PageStyle.container}>
         <Header

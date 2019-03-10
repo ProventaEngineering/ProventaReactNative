@@ -1,7 +1,10 @@
 import React, { Component } from "react";
-import { View, ScrollView, Text, Image, TouchableOpacity, Linking } from "react-native";
+import { View, ScrollView, Text, Image, TouchableOpacity, Linking, ActivityIndicator } from "react-native";
 import { Header, TabbedMenu, Card } from "../../../../components";
 import PageStyle from "./styles";
+import ComponentStyle from "../../../../components/TabbedMenu/styles";
+import {connect} from "react-redux";
+import * as actions from "../../../../actions";
 
 class FacilitatorDetailsPage extends Component {
   state = {
@@ -55,22 +58,46 @@ class FacilitatorDetailsPage extends Component {
   }
 
   render() {
-    const { navigation } = this.props;
+    const { navigation, user } = this.props;
     const content = navigation.getParam("content");
-    return (
-      <View style={PageStyle.container}>
-        <Header
-          label="FACILITATOR DETAILS"
-          status="details"
-          onPress={() => {
-            navigation.goBack();
-          }}
-        />
-        {this.renderContent()}
-        <TabbedMenu navigation={navigation} status="loggedin" />
-      </View>
-    );
+    if(user !== undefined && user.hasProfileLoaded) {
+      return (
+        <View style={PageStyle.container}>
+          <Header
+            label="FACILITATOR DETAILS"
+            status="details"
+            onPress={() => {
+              navigation.goBack();
+            }}
+          />
+          {this.renderContent()}
+          <TabbedMenu navigation={navigation} user={user} status="loggedin"/>
+        </View>
+      );
+    }else{
+      return (
+        <View style={ComponentStyle.container}>
+          <View style={PageStyle.loading}>
+            <ActivityIndicator loaded="false" size="large" />
+          </View>
+        </View>
+      );
+    }
   }
 }
 
-export default FacilitatorDetailsPage;
+const mapStatetoProps = ({ meetingsState, auth, userState }) => {
+  const { meeting,
+    hasLoadedMeeting
+  } = meetingsState;
+  const { meetings } = meetingsState;
+  const { user } = userState;
+  const { status, token } = auth;
+  return {
+    meetings, meeting, hasLoadedMeeting, status, user, token
+  };
+};
+export default connect(
+  mapStatetoProps,
+  { actions }
+)(FacilitatorDetailsPage);

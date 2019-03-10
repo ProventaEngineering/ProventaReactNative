@@ -31,7 +31,7 @@ class TabbedMenu extends Component {
   renderSignedIn() {
     const { navigation, user } = this.props;
 
-    if(user.hasProfileLoaded) {
+    if(user !== undefined && user.hasProfileLoaded) {
       const meeting = user.profile.meetings[0]
       return (
         <View style={ComponentStyle.container}>

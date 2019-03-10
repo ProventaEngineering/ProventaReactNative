@@ -96,12 +96,6 @@ class InformationPage extends Component {
 
   render() {
     const { navigation, user } = this.props;
-
-
-    // const meeting = user.profile;
-    // if(meeting != undefined){
-    //   console.log(">>>>>>>IP", meeting);
-    // }
     return (
       <View style={PageStyle.container}>
         <Header

@@ -32,31 +32,10 @@ class MeetingPage extends Component {
       // Error retrieving data
     }
   }
-  // componentDidMount() {
-  //
-  //   try {
-  //     const { navigation, token } = this.props;
-  //     const id = navigation.getParam("meetingId");
-  //     // const token = await AsyncStorage.getItem('token');
-  //     console.log("=================status from props", status)
-  //     console.log("=================id from params", id)
-  //     console.log("=================token from props", token)
-  //     this.props.fetchMeeting(id, this.state.status, token);
-  //     // if (status === "loggedin") {
-  //     //     this.props.fetchMeeting(id, loggedin, token);
-  //     // } else {
-  //     //     this.props.fetchMeeting(id, "loggedout", null);
-  //     // }
-  //   } catch (error) {
-  //       // Error retrieving data
-  //   }
-  // }
-
 
   renderTitle() {
     const { user } = this.props;
     const meeting = user.profile.meetings[0];
-    // console.log(">>>>>>>>>>>>> ito", user.profile.meetings[0]);
     return (
       <Card>
         {this.renderMeetingPicture(meeting.venues)}
@@ -225,9 +204,6 @@ class MeetingPage extends Component {
   render() {
     const { navigation, user} = this.props;
     const status = (user.profile.token !=null ? "loggedin" : "loggedout");
-    // if(user.profile!=undefined){
-    //   console.log("==========rendering Meeting Profile", user.profile);
-    // }
 
     return (
       <View style={PageStyle.container}>

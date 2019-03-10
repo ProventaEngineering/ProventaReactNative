@@ -51,27 +51,6 @@ export const fetchMeetings = () => async dispatch => {
   }catch (e) {
 
   }
-
-  // try {
-  //
-  //   const request = await axios.get(
-  //     url, {
-  //       "headers": {
-  //         "Content-Type": "application/json",
-  //         "Authorization": token
-  //       }
-  //     }
-  //   );
-  //
-  //   const meetings = await request.data;
-  //   console.log(">>>>>>>>>>>", meetings);
-  //   dispatch({
-  //     type: FETCH_MEETINGS_RESPONSE,
-  //     payload: meetings.data
-  //   });
-  // } catch (error) {
-  //   console.log(error);
-  // }
 };
 
 //Retrieve main meetings
@@ -83,27 +62,6 @@ export const fetchMeeting = () => async dispatch => {
   }catch(e){
 
   }
-  // const url =
-  //   status === "loggedin"
-  //     ? `${SERVER_ADDRESS}/meetings/${id}`
-  //     : `${SERVER_ADDRESS}/anonymous/meetings/${id}`;
-  // console.log("======fetching id", id)
-  // console.log("======fetching status", status)
-  // console.log("======fetching token", token)
-  // try {
-  //   const request = await axios.get(url, {
-  //     "headers": {
-  //       "Content-Type": "application/json",
-  //       "Authorization": token
-  //     }
-  //   });
-  //   dispatch({
-  //     type: FETCH_MEETING,
-  //     payload: request.data.data.attributes
-  //   });
-  // } catch (error) {
-  //   console.log(error);
-  // }
 };
 
 //Retrieve main venue

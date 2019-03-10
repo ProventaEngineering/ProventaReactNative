@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { View, Text, ScrollView, AsyncStorage } from "react-native";
+import { View, Text, ScrollView, AsyncStorage, ActivityIndicator } from "react-native";
 import { Header, TabbedMenu, ListItem, Accordion } from "../../../components";
 import PageStyle from "./styles";
 import { connect } from "react-redux";
 import { DrawerActions } from "react-navigation";
 import * as actions from "../../../actions";
+import ComponentStyle from "../../../components/TabbedMenu/styles";
 
 class SchedulePage extends Component {
   state = {
@@ -15,24 +16,6 @@ class SchedulePage extends Component {
     selectedIndex: 1,
     selectedInnerIndex: 1
   };
-
-  async componentDidMount() {
-    try {
-      console.log('sadasasdasdsad');
-      const { navigation } = this.props;
-      const token = await AsyncStorage.getItem('token');
-      console.log("Schedule", token);
-      if (token !== null) {
-        console.log("SchedulePage", token)
-        this.props.updateStatus(token).then(() => {
-          this.props.fetchDiscussions(35, "loggedin", token);
-        })
-      }
-    } catch (error) {
-      // Error retrieving data
-    }
-  }
-
 
   formatHours(date) {
     var date = new Date(date);
@@ -81,33 +64,34 @@ class SchedulePage extends Component {
 
 
   renderSessions() {
-    const { navigation, discussions } = this.props;
-    const session = discussions.map(({ id, attributes }) => {
-      if (attributes.talksWithFacilitator.data.length == 0) {
+    const { navigation, user } = this.props;
+    const meeting = user.profile.meetings[0];
+    const session = meeting.discussions.map((discussion, index, discussions) => {
+      if (discussion.talks.length == 0) {
         return (
-          <View key={id} style={PageStyle.ListContainer}>
+          <View key={index} style={PageStyle.ListContainer}>
             <ListItem
               onPress={() => {
                 this.props.navigation.navigate("ScheduleDetailsPage", {
-                  location: attributes.floorPlans[0] ? attributes.floorPlans[0].location : null,
-                  image: attributes.floorPlans[0] ? attributes.floorPlans[0].image.url : null,
-                  label: attributes.title
+                  location: discussion.floorPlans[0] ? discussion.floorPlans[0].location : null,
+                  image: discussion.floorPlans[0] ? discussion.floorPlans[0].image.url : null,
+                  label: discussion.title
                 });
               }}
             >
               <View
                 style={[
-                  id == discussions.length - 1
+                  index == discussions.length - 1
                     ? [PageStyle.scheduleList, { borderBottomWidth: 0 }]
                     : PageStyle.scheduleList
                 ]}
               >
                 <View>
                   <Text style={PageStyle.text}>
-                    {this.formatHours(attributes.startTime)}:{this.formatMinutes(attributes.startTime)}-{" "}
-                    {this.formatHours(attributes.endTime)}:{this.formatMinutes(attributes.endTime)}
+                    {this.formatHours(discussion.start_time)}:{this.formatMinutes(discussion.start_time)}-{" "}
+                    {this.formatHours(discussion.end_time)}:{this.formatMinutes(discussion.end_time)}
                   </Text>
-                  <Text style={PageStyle.title}>{attributes.title}</Text>
+                  <Text style={PageStyle.title}>{discussion.title}</Text>
                 </View>
               </View>
             </ListItem>
@@ -115,9 +99,9 @@ class SchedulePage extends Component {
         );
       } else {
         return (
-          <View key={id} style={PageStyle.ListContainer}>
-            <Accordion sessionTitle={attributes.title} startTime={attributes.startTime} endTime={attributes.endTime}>
-              {this.renderDropdownList(attributes.talksWithFacilitator.data)}
+          <View key={index} style={PageStyle.ListContainer}>
+            <Accordion sessionTitle={discussion.title} startTime={discussion.start_time} endTime={discussion.end_time}>
+              {this.renderDropdownList(discussion.talks)}
             </Accordion>
           </View>
         );
@@ -125,31 +109,26 @@ class SchedulePage extends Component {
     });
     return session;
   }
-
+// {
+//   label: talk.title,
+//   topic: talk.topic,
+//   description: talk.description,
+//   eventTitle: talk.topic,
+//   name: talk.facilitators[0].first_name + ' ' + talk.facilitators[0].last_name,
+//   nameTitle: talk.facilitators[0].company + ' ' + talk.facilitators[0].position,
+//   linkedIn: talk.facilitators[0].linkedin,
+//   location: talk.floorPlans[0].location,
+//   image: talk.floorPlans[0].image.url
+// }
   renderDropdownList(talks) {
     const { navigation } = this.props;
-    console.log(talks);
-    const event = talks.map(({ id, attributes }) => {
-      console.log(attributes);
+    const event = talks.map((talk, index, talks) => {
+      console.log(talk);
       return (
-        <View key={id} style={PageStyle.dropdownList}>
-          <ListItem
-            onPress={() => {
-              navigation.navigate("ScheduleDetailsPage", {
-                label: attributes.title,
-                topic: attributes.topic,
-                description: attributes.description,
-                eventTitle: attributes.topic,
-                name: attributes.facilitators[0].first_name + ' ' + attributes.facilitators[0].last_name,
-                nameTitle: attributes.facilitators[0].company + ' ' + attributes.facilitators[0].position,
-                linkedIn: attributes.facilitators[0].linkedin,
-                location: attributes.floorPlans[0].location,
-                image: attributes.floorPlans[0].image.url
-              });
-            }}
-          >
+        <View key={index} style={PageStyle.dropdownList}>
+          <ListItem onPress={() => { navigation.navigate("ScheduleDetailsPage", {talk: talk}); }} >
             <View>
-              <Text style={PageStyle.title}>{attributes.title}</Text>
+              <Text style={PageStyle.title}>{talk.title}</Text>
             </View>
           </ListItem>
         </View >
@@ -158,48 +137,61 @@ class SchedulePage extends Component {
     return event;
   }
   renderFloorPlan(map) {
-    return <Image source={map.image
-    } style={PageStyle.mapImage} />;
+    return <Image source={map.image} style={PageStyle.mapImage} />;
   }
 
   render() {
-    const { navigation } = this.props;
-    return (
-      <View style={PageStyle.container}>
-        <Header
-          label="SCHEDULE"
-          status="details"
-          onPress={() => {
-            navigation.navigate("InformationPage", {
-              status: "loggedin"
-            })
-          }}
-        />
-        <ScrollView>
-          {/* <Text style={PageStyle.header}> MORNING SESSION </Text> */}
-          <Text style={PageStyle.header}>  SESSIONS </Text>
-          {this.renderSessions()}
-          {/* <Text style={PageStyle.header}> AFTERNOON SESSION </Text> */}
-          {/* {this.renderSessions('pm')} */}
-        </ScrollView>
-        <TabbedMenu navigation={navigation} status="loggedin" />
-      </View>
-    );
+    const { navigation, user } = this.props;
+    if(user !== undefined && user.hasProfileLoaded) {
+      return (
+        <View style={PageStyle.container}>
+          <Header
+            label="SCHEDULE"
+            status="details"
+            onPress={() => {
+              navigation.navigate("InformationPage", {
+                status: "loggedin"
+              })
+            }}
+          />
+          <ScrollView>
+            {/* <Text style={PageStyle.header}> MORNING SESSION </Text> */}
+            <Text style={PageStyle.header}> SESSIONS </Text>
+            {this.renderSessions()}
+            {/* <Text style={PageStyle.header}> AFTERNOON SESSION </Text> */}
+            {/* {this.renderSessions('pm')} */}
+          </ScrollView>
+          <TabbedMenu navigation={navigation} user={user} status="loggedin"/>
+        </View>
+      );
+    }else{
+      return (
+        <View style={ComponentStyle.container}>
+          <View style={PageStyle.loading}>
+            <ActivityIndicator loaded="false" size="large" />
+          </View>
+        </View>
+      );
+    }
   }
 }
 
-const mapStatetoProps = ({ meeting, auth }) => {
-  const { discussions, talks } = meeting;
-  const { token, status } = auth;
+
+const mapStatetoProps = ({ meetingsState, auth, userState }) => {
+  const { meeting,
+    hasLoadedMeeting
+  } = meetingsState;
+  const { meetings } = meetingsState;
+  const { user } = userState;
+  const { status, token } = auth;
   return {
-    discussions,
-    talks,
-    token,
-    status
+    meetings, meeting, hasLoadedMeeting, status, user, token
   };
 };
-
-export default connect(mapStatetoProps, actions)(SchedulePage);
+export default connect(
+  mapStatetoProps,
+  { actions }
+)(SchedulePage);
 
 
 
