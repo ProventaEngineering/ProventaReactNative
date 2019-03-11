@@ -1,6 +1,7 @@
 import {
   FETCH_MEETINGS_REQUEST,
   FETCH_MEETINGS_RESPONSE,
+  FETCH_MEETINGS_FAILED,
   FETCH_INBOX,
   FETCH_FILTERED_MEETINGS,
   FETCH_MEETING,
@@ -31,6 +32,11 @@ export default function (state = INITIAL_STATE, action) {
       return {
         ...state,
         meetings: {items: action.payload, hasLoadedMeetings: true},
+      };
+    case FETCH_MEETINGS_FAILED:
+      return {
+        ...state,
+        meetings: {items: [], hasLoadedMeetings: false},
       };
     case FETCH_MEETING_REQUEST:
       return {

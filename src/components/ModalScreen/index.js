@@ -17,6 +17,7 @@ class ModalScreen extends Component {
   componentWillReceiveProps() {
     // const { first_name, last_name, position, company, description } = this.props.facilitator;
     const { modalVisible } = this.props;
+    console.log("ModalVisible: >>>>>>>>>>>", modalVisible);
     this.setState({ open: modalVisible });
   }
 
@@ -76,7 +77,7 @@ class ModalScreen extends Component {
           closeModal();
         }}
       >
-        <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.7)" }}>
+     <View style={{flex: 1, backgroundColor: "rgba(0,0,0,0.7)"}}>
           {this.renderFacilitator(first_name, last_name, position, company, description)}
         </View>
       </Modal>

@@ -20,7 +20,7 @@ class MeetingPage extends Component {
 
   state = {
     modalVisible: false,
-    selectedIndex: 1,
+    selectedIndex: null,
     status: "loggedout"
   };
 
@@ -163,7 +163,7 @@ class MeetingPage extends Component {
               <View style={PageStyle.expectationBorder} />
             </ListItem>
             <ModalScreen
-              facilitator={facilitators[this.state.selectedIndex]}
+              facilitator={this.state.selectedIndex == null ? facilitators[0]: facilitators[this.state.selectedIndex]}
               modalVisible={this.state.modalVisible}
             />
           </View>
@@ -246,14 +246,11 @@ class MeetingPage extends Component {
 }
 
 const mapStatetoProps = ({ meetingsState, auth, userState }) => {
-  const { meeting,
-    hasLoadedMeeting
-  } = meetingsState;
   const { meetings } = meetingsState;
   const { user } = userState;
   const { status, token } = auth;
   return {
-      meetings, meeting, hasLoadedMeeting, status, user, token
+      meetings, status, user, token
   };
 };
 export default connect(

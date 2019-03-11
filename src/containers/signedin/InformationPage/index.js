@@ -42,19 +42,13 @@ class InformationPage extends Component {
     ]
   };
 
-  //  componentDidMount() {
-  //   try {
-  //     const { navigation, meetings } = this.props;
-  //     this.props.fetchProfile();
-  //   } catch (error) {
-  //     // Error retrieving data
-  //   }
-  // }
 
   renderMenu(menu) {
     const { navigation, user, status } = this.props;
-    const meeting = user.profile;
-
+    const meeting = {id: null}
+    if(user !== undefined && user.hasProfileLoaded) {
+      meeting.id = user.profile.meetings[0].id
+    }
 
     const menuItem = menu.map(({ id, image, label, name }) => {
       return (
@@ -69,7 +63,7 @@ class InformationPage extends Component {
                 })
               } else {
                 navigation.navigate("SchedulePage", {
-                  meetingId: 35,
+                  meetingId: meeting.id,
                   status: "loggedin"
                 })
               }
@@ -117,18 +111,16 @@ class InformationPage extends Component {
     );
   }
 }
-const mapStatetoProps = ({ meetingsState, auth, userState }) => {
-  const { meeting,
-    hasLoadedMeeting
-  } = meetingsState;
+const mapStateToProps = ({ meetingsState, auth, userState }) => {
+
   const { meetings } = meetingsState;
   const { user } = userState;
   const { status, token } = auth;
   return {
-    meetings, meeting, hasLoadedMeeting, status, user, token
+    meetings, status, user, token
   };
 };
 export default connect(
-  mapStatetoProps,
+  mapStateToProps,
   { actions }
 )(InformationPage);

@@ -55,6 +55,7 @@ export const SETTINGS_CONFIG_FAIL = "settings_config_fail";
 // Getting all meetings (anonymous/signed-in)
 export const FETCH_MEETINGS_REQUEST = "fetch_meetings_request";
 export const FETCH_MEETINGS_RESPONSE = "fetch_meetings_response";
+export const FETCH_MEETINGS_FAILED = "fetch_meetings_failed";
 
 // Get main meeting
 export const FETCH_MEETING_REQUEST = "fetch_meeting_request";

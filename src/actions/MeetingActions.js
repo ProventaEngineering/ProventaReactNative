@@ -17,7 +17,7 @@ import {
   MESSAGE_UPDATE,
   MESSAGE_UPDATE_SUCCESS,
   MESSAGE_UPDATE_FAIL,
-  SERVER_ADDRESS
+  SERVER_ADDRESS, FETCH_MEETINGS_FAILED
 } from "./types";
 
 import { AsyncStorage } from "react-native";
@@ -49,146 +49,15 @@ export const fetchMeetings = () => async dispatch => {
     const meetings = await request.data;
     dispatch({ type: FETCH_MEETINGS_RESPONSE, payload: meetings.data });
   }catch (e) {
-
-  }
-};
-
-//Retrieve main meetings
-export const fetchMeeting = () => async dispatch => {
-
-  try{
-    const token = await AsyncStorage.getItem('token');
-
-  }catch(e){
-
-  }
-};
-
-//Retrieve main venue
-export const fetchMainVenue = (id, status, token) => async dispatch => {
-  const url =
-    status === "loggedin"
-      ? `${SERVER_ADDRESS}/meetings/${id}`
-      : `${SERVER_ADDRESS}/anonymous/meetings/${id}`;
-  try {
-    const request = await axios.get(url, {
-      "headers": {
-        "Content-Type": "application/json",
-        "Authorization": token
-      }
-    });
-    dispatch({
-      type: FETCH_MAIN_VENUE,
-      payload: request.data.data.attributes.venues
-    });
-  } catch (error) {
-    console.log(error);
+    await AsyncStorage.removeItem('token');
+    dispatch({ type: FETCH_MEETINGS_FAILED, payload: {message: e.toString()}, error: true });
   }
 };
 
 
 
-//Retrieve main expectations
-export const fetchExpectations = (id, status, token) => async dispatch => {
-  const url = status === "loggedin" ? `${SERVER_ADDRESS}/meetings/${id}` : `${SERVER_ADDRESS}/anonymous/meetings/${id}`
-  try {
-    const request = await axios.get(
-      url, { "headers": { "Content-Type": "application/json", "Authorization": token } }
-    );
-    dispatch({
-      type: FETCH_MAIN_EXPECTATIONS,
-      payload: request.data.data.attributes.expectations
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
 
-//Retrieve main facilitators
-export const fetchFacilitators = (id, status, token) => async dispatch => {
-  const url = status === "loggedin" ? `${SERVER_ADDRESS}/meetings/${id}` : `${SERVER_ADDRESS}/anonymous/meetings/${id}`
-  try {
-    const request = await axios.get(
-      url, { "headers": { "Content-Type": "application/json", "Authorization": token } }
-    );
-    dispatch({
-      type: FETCH_MAIN_FACILITATORS,
-      payload: request.data.data.attributes.facilitators
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
 
-//Retrieve main participants
-export const fetchParticipants = (id, status, token) => async dispatch => {
-  const url = status === "loggedin" ? `${SERVER_ADDRESS}/meetings/${id}` : `${SERVER_ADDRESS}/anonymous/meetings/${id}`
-  try {
-    const request = await axios.get(url, { "headers": { "Content-Type": "application/json", "Authorization": token } });
-    dispatch({
-      type: FETCH_MAIN_PARTICIPANTS,
-      payload: request.data.data.attributes.participants
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-//Retrieve main sponsors
-export const fetchSponsors = (id, status, token) => async dispatch => {
-  const url = status === "loggedin" ? `${SERVER_ADDRESS}/meetings/${id}` : `${SERVER_ADDRESS}/anonymous/meetings/${id}`
-  try {
-    const request = await axios.get(url, { "headers": { "Content-Type": "application/json", "Authorization": token } });
-    dispatch({
-      type: FETCH_MAIN_SPONSORS,
-      payload: request.data.data.attributes.sponsors
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-//Retrieve main floorplans
-export const fetchFloorPlans = (id, status, token) => async dispatch => {
-  const url = status === "loggedin" ? `${SERVER_ADDRESS}/meetings/${id}` : `${SERVER_ADDRESS}/anonymous/meetings/${id}`
-  try {
-    const request = await axios.get(url, { "headers": { "Content-Type": "application/json", "Authorization": token } });
-    dispatch({
-      type: FETCH_MAIN_FLOORPLANS,
-      payload: request.data.data.attributes.floorPlans
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-//Retrieve main discussions
-export const fetchDiscussions = (id, status, token) => async dispatch => {
-  const url = status === "loggedin" ? `${SERVER_ADDRESS}/meetings/${id}` : `${SERVER_ADDRESS}/anonymous/meetings/${id}`
-  try {
-    const request = await axios.get(url, { "headers": { "Content-Type": "application/json", "Authorization": token } });
-    dispatch({
-      type: FETCH_MAIN_DISCUSSIONS,
-      payload: request.data.data.attributes.discussionsWithTalks.data
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-//Retrieve main talks
-export const fetchTalks = (id, status, token) => async dispatch => {
-  const url = status === "loggedin" ? `${SERVER_ADDRESS}/meetings/${id}` : `${SERVER_ADDRESS}/anonymous/meetings/${id}`
-  try {
-    const request = await axios.get(url, { "headers": { "Content-Type": "application/json", "Authorization": token } });
-    dispatch({
-      type: FETCH_MAIN_TALKS,
-      payload: request.data.data.attributes.discussionsWithTalks
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
 
 // //Retrieve fitered meetings
 // export const fetchFilteredMeetings = (query) => {
