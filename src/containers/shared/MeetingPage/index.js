@@ -26,47 +26,63 @@ class MeetingPage extends Component {
 
    componentDidMount() {
     try {
-      const { navigation, meetings } = this.props;
-      this.props.fetchProfile();
+      const { navigation } = this.props;
+      //set status
+      this.setState({status: navigation.getParam("status")}, ()=> { this.setNavigationMeetingId() });
+      //set meeting id in navigation param if undefined or null
     } catch (error) {
       // Error retrieving data
     }
   }
 
+  setNavigationMeetingId(){
+    const { navigation, user, meetings } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    if(meetingId == undefined || meetingId == null){ //set meeting id from profile meeting ids if loggedin or first of ids from meetings ids
+      if(this.state.status == "loggedin" && user.meeting_ids.length > 0){
+        navigation.setParams({meetingId: user.meeting_ids[0]});
+      } else{
+        navigation.setParams({meetingId: meetings.ids[0]});
+      }
+
+    }
+  }
+
   renderTitle() {
-    const { user } = this.props;
-    const meeting = user.profile.meetings[0];
+    const { meetings, navigation } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
     return (
       <Card>
-        {this.renderMeetingPicture(meeting.venues)}
+        {this.renderMeetingPicture()}
         <View style={PageStyle.info}>
           <Text style={PageStyle.description}>{meeting.title}</Text>
           <Text style={PageStyle.date}>{meeting.date}</Text>
-          <Text style={PageStyle.area}> { this.renderVenue(meeting.venues) }</Text>
+          <Text style={PageStyle.area}> { this.renderVenue() }</Text>
         </View>
       </Card>
     );
   }
 
-  renderVenue(venues) {
-    const venue = venues.map(({ id, title }) => {
-      return <Text key={id}> {title} </Text>;
-    });
+  renderVenue() {
+    const { meetings, navigation } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
 
-    return venue;
+    return  <Text key={meeting.venue.id}> {meeting.venue.title} </Text>;
   }
 
-  renderMeetingPicture(venues) {
-    const venue = venues.map(({ image, id }) => {
-      return <Image key={id} style={PageStyle.image} source={image} />;
-    });
-
-    return venue;
+  renderMeetingPicture() {
+    const { meetings, navigation } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
+    return <Image key={meeting.venue.id} style={PageStyle.image} source={meeting.venue.image} />;
   }
 
   renderVideo() {
-    const { user } = this.props;
-    const meeting  = user.profile.meetings[0];
+    const { meetings, navigation } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
 
     return (
       <Card>
@@ -76,8 +92,9 @@ class MeetingPage extends Component {
   }
 
   renderDescription() {
-    const { user } = this.props;
-    const meeting  = user.profile.meetings[0];
+    const { meetings, navigation } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
     return (
       <Card>
         <View style={PageStyle.textArea}>
@@ -88,8 +105,9 @@ class MeetingPage extends Component {
   }
 
   renderExpectations() {
-    const { user } = this.props;
-    const meeting  = user.profile.meetings[0];
+    const { meetings, navigation } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
     const expectation = meeting.expectations.map(
       ({ id, image, title, description }) => {
         return (
@@ -122,8 +140,9 @@ class MeetingPage extends Component {
   }
 
   renderFacilitators() {
-    const { user } = this.props;
-    const meeting  = user.profile.meetings[0];
+    const { meetings, navigation } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
 
     const facilitator = meeting.facilitators.map(
       ({ id, first_name, last_name, position }, index, facilitators) => {
@@ -175,19 +194,18 @@ class MeetingPage extends Component {
 
   }
 
-  renderMap(venues) {
-    const venue = venues.map(({ title, latitude, longitude, id }) => {
-      return (
-        <Map key={id} latitude={latitude} longitude={longitude} title={title} />
-      );
-    });
+  renderMap() {
+    const { meetings, navigation } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
 
-    return venue;
+    return <Map key={meeting.venue.id} latitude={meeting.venue.latitude} longitude={meeting.venue.longitude} title={meeting.venue.title} />;
   }
 
   renderDetails() {
-    const { user } = this.props;
-    const meeting  = user.profile.meetings[0];
+    const { meetings, navigation } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
     if (this.state.status !== "loggedin")
       return (
         <View>
@@ -196,20 +214,19 @@ class MeetingPage extends Component {
           <Text style={[PageStyle.header, PageStyle.mapContainer]}>VENUE</Text>
           {/* For refactoring, must be inside Card */}
           <View style={PageStyle.mapContainer} />
-          <Card>{this.renderMap(meeting.venues)}</Card>
+          <Card>{this.renderMap()}</Card>
         </View>
       );
   }
 
   render() {
-    const { navigation, user} = this.props;
-    const status = (user.profile.token !=null ? "loggedin" : "loggedout");
+    const { navigation, meetings} = this.props;
 
     return (
       <View style={PageStyle.container}>
         <Header
           label="MEETING DETAILS"
-          status={status}
+          status={this.state.status}
           settings={() =>
             navigation.navigate("SettingsPage", {
               content: "settings",
@@ -218,7 +235,7 @@ class MeetingPage extends Component {
           }
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         />
-        {user.hasProfileLoaded ?
+        {meetings.hasMeetingsLoaded ?
           <ScrollView>
             <Image
               style={PageStyle.backgroundImage}
@@ -235,11 +252,11 @@ class MeetingPage extends Component {
             </View>
           </ScrollView> :
           <View style={PageStyle.loading}>
-            <ActivityIndicator loaded={user.hasProfileLoaded} size="large" />
+            <ActivityIndicator loaded={meetings.hasMeetingsLoaded} size="large" />
           </View>
         }
 
-        <TabbedMenu status={status} user={user} navigation={navigation}/>
+        <TabbedMenu status={this.state.status} navigation={navigation}/>
       </View >
     );
   }

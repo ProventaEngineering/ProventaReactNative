@@ -12,10 +12,9 @@ import {
 
 const INITIAL_STATE = {
   meetings: {
-    hasLoadedMeetings: false,
-    items: [],
-    main: {},
-    hasLoadedMainMeeting: false
+    hasMeetingsLoaded: false, //will have an
+    ids: [],
+    //ids as index
   },
 };
 
@@ -26,17 +25,20 @@ export default function (state = INITIAL_STATE, action) {
     case FETCH_MEETINGS_REQUEST:
       return {
         ...state,
-        meetings: {items: [], hasLoadedMeetings: false},
+        meetings: {items: [], hasMeetingsLoaded: false},
       };
     case FETCH_MEETINGS_RESPONSE:
       return {
         ...state,
-        meetings: {items: action.payload, hasLoadedMeetings: true},
+        meetings: {
+          ids: action.payload.map(({ id }) => id),
+          items: Object.assign({}, ...action.payload.map(item => ({ [item.id]: item.attributes }) ) ),
+          hasMeetingsLoaded: true},
       };
     case FETCH_MEETINGS_FAILED:
       return {
         ...state,
-        meetings: {items: [], hasLoadedMeetings: false},
+        meetings: {items: [], hasMeetingsLoaded: false},
       };
     case FETCH_MEETING_REQUEST:
       return {

@@ -22,7 +22,7 @@ class ModalScreen extends Component {
   }
 
   toggleMenu() {
-    this.setState({
+    super.setState({
       open: false
     });
   }

@@ -17,12 +17,8 @@ import { Permissions, Notifications } from 'expo';
 
 class HomePage extends Component {
   state = {
-    meetings: {
-      items: [],
-      isFetched: false
-    },
     notification: {},
-    loading: true
+    status: "loggedout"
   };
 
 
@@ -32,9 +28,16 @@ class HomePage extends Component {
       this.registerForPushNotificationsAsync();
       this.notificationSubscription = Notifications.addListener(this.handleNotification);
 
-      //Todo: getToken
-      //Todo: getToken
-      this.props.fetchMeetings();
+      const token = await AsyncStorage.getItem("token");
+      if(token){
+        this.setState({status: "loggedin"},()=>{
+          this.props.fetchProfile();
+        })
+      }else {
+        this.setState({status: "loggedout"},()=>{
+          this.props.fetchMeetings();
+        })
+      }
 
 
 
@@ -91,25 +94,26 @@ class HomePage extends Component {
 
   renderMeetings() {
     const { navigation, meetings } = this.props;
-    const meeting = meetings.items.map(({ id, attributes }) => {
+    console.log(meetings.items)
+    const meeting = meetings.ids.map((id) => {
       return (
         <View key={id} style={PageStyle.eventList}>
           <ListItem
             onPress={() =>
-              navigation.navigate("MeetingPage", { meetingId: id, status: "loggedout" })
+              navigation.navigate("MeetingPage", { meetingId: id, status: this.state.status })
             }
           >
             <Card style={{ width: "90%" }}>
               <Image
                 style={PageStyle.eventTitle}
                 source={{
-                  uri: attributes.image.url
+                  uri: meetings.items[id].image.url
                 }}
               />
               <Text style={PageStyle.eventDescription}>
-                {attributes.title}
+                {meetings.items[id].title}
               </Text>
-              <Text style={PageStyle.eventDate}> {attributes.date} | { this.renderVenue(attributes.venues) }</Text>
+              <Text style={PageStyle.eventDate}> {meetings.items[id].date} | { meetings.items[id].venue.title }</Text>
               <View style={PageStyle.eventBorder} />
             </Card>
           </ListItem>
@@ -120,18 +124,10 @@ class HomePage extends Component {
   }
 
 
-  renderVenue(venues) {
-      const venue = venues.map(({ id, title }) => {
-          return <Text key={id}> {title} </Text>;
-      });
-
-      return venue;
-  }
-
   featuredMeeting(){
       const { meetings } = this.props;
     //Todo: featured meeting logic
-    return meetings.items[0].attributes;
+    return meetings.items[meetings.ids[0]];
   }
 
   render() {
@@ -144,9 +140,9 @@ class HomePage extends Component {
             navigation.dispatch(DrawerActions.openDrawer());
           }}
         />
-        {( meetings.hasLoadedMeetings )? (
+        {( meetings.hasMeetingsLoaded )? (
           <ScrollView>
-            <ListItem onPress={() => navigation.navigate("MeetingPage", { meetingId: this.featuredMeeting().id, status: "loggedout" })}>
+            <ListItem onPress={() => navigation.navigate("MeetingPage", { meetingId: this.featuredMeeting().id, status: this.state.status })}>
               <Card>
                 <Image
                   style={PageStyle.image}
@@ -157,7 +153,7 @@ class HomePage extends Component {
                 <View style={PageStyle.info}>
                   <Text style={PageStyle.description}>{this.featuredMeeting().title}</Text>
                   <Text style={PageStyle.date}>
-                    {this.featuredMeeting().date} | {this.renderVenue(this.featuredMeeting().venues)}
+                    {this.featuredMeeting().date} | {this.featuredMeeting().venue.title}
                   </Text>
                 </View>
               </Card>
@@ -171,7 +167,7 @@ class HomePage extends Component {
           </ScrollView>
         ) : (
             <View style={PageStyle.loading}>
-              <ActivityIndicator loaded={(!meetings.hasLoadedMeetings)} size="large" />
+              <ActivityIndicator loaded={(!meetings.hasMeetingsLoaded)} size="large" />
             </View>
           )}
         <TabbedMenu navigation={navigation} status={this.state.status} />

@@ -33,23 +33,17 @@ export const fetchMeetings = () => async dispatch => {
 
   //get token then fetch meetings
   try {
-    const token = await AsyncStorage.getItem('token');
-    const url =
-      token != null
-        ? `${SERVER_ADDRESS}/meetings`
-        : `${SERVER_ADDRESS}/anonymous/meetings`;
+    const url = `${SERVER_ADDRESS}/anonymous/meetings`;
     const request = await axios.get(
       url, {
         "headers": {
-          "Content-Type": "application/json",
-          "Authorization": token
+          "Content-Type": "application/json"
         }
       }
     );
     const meetings = await request.data;
     dispatch({ type: FETCH_MEETINGS_RESPONSE, payload: meetings.data });
   }catch (e) {
-    await AsyncStorage.removeItem('token');
     dispatch({ type: FETCH_MEETINGS_FAILED, payload: {message: e.toString()}, error: true });
   }
 };
