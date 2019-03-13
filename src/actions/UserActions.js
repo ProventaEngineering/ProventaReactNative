@@ -9,6 +9,7 @@ import {
 } from "./types"
   ;
 import axios from "axios";
+import {fetchMeetings} from "./MeetingActions";
 import {AsyncStorage} from "react-native";
 
 //Update emailAddress and password field
@@ -20,8 +21,21 @@ export const updateUser = ({ prop, value }) => {
 };
 
 //Retrieve user profile
+export const fetchProfileAndMeetings = (token) => async dispatch => {
+  try {
+    return dispatch(fetchProfile(token)).then(() => dispatch(fetchMeetings(token)));
+  }catch (e){
+    failedFetchProfileAndMeeting(e)
+  }
 
+};
+
+export const failedFetchProfileAndMeeting = (e) => async dispatch => {
+  dispatch({ type: FETCH_PROFILE_FAILED, payload: {message: e.toString()}, error: true });
+  dispatch({ type: FETCH_MEETINGS_FAILED, payload: {message: e.toString()}, error: true })
+}
 export const fetchProfile = (token) => async dispatch => {
+
     dispatch({type: FETCH_PROFILE_REQUEST});
     const url = `${SERVER_ADDRESS}/profile`;
     try {

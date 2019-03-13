@@ -11,7 +11,7 @@ import { connect } from "react-redux";
 import { Header, TabbedMenu, Card, ListItem } from "../../../components";
 import PageStyle from "./styles";
 import { DrawerActions } from "react-navigation";
-import * as actions from "../../../actions";
+import {fetchProfile, fetchMeetings, fetchProfileAndMeetings} from "../../../actions";
 import { Permissions, Notifications } from 'expo';
 
 
@@ -22,23 +22,17 @@ class HomePage extends Component {
   };
 
 
-
   async componentWillMount() {
     try {
       this.registerForPushNotificationsAsync();
       this.notificationSubscription = Notifications.addListener(this.handleNotification);
 
       const token = await AsyncStorage.getItem("token");
-      if(token){
-        this.setState({status: "loggedin"},()=>{
-          this.props.fetchProfile(token);
-          this.props.fetchMeetings(token);
-          this.props.navigation.navigate("MeetingPage", {status: this.state.status});
-        })
-      }else {
+      if(token == null || token == undefined ){
         this.setState({status: "loggedout"},()=>{
           this.props.fetchMeetings();
         })
+
       }
 
 
@@ -47,6 +41,31 @@ class HomePage extends Component {
       // Error retrieving data
     }
   }
+
+  // async componentWillMount() {
+  //   try {
+  //     this.registerForPushNotificationsAsync();
+  //     this.notificationSubscription = Notifications.addListener(this.handleNotification);
+  //
+  //     const token = await AsyncStorage.getItem("token");
+  //     if(token){
+  //
+  //       this.setState({status: "loggedin"},()=>{
+  //         this.props.fetchProfileAndMeetings(token);
+  //         this.props.navigation.navigate("MeetingPage", {status: this.state.status});
+  //       })
+  //     }else {
+  //       this.setState({status: "loggedout"},()=>{
+  //         this.props.fetchMeetings();
+  //       })
+  //     }
+  //
+  //
+  //
+  //   } catch (error) {
+  //     // Error retrieving data
+  //   }
+  // }
 
 
   handleNotification = (notification) => {
@@ -177,20 +196,16 @@ class HomePage extends Component {
   }
 }
 
-const mapStateToProps = ({ meetingsState, userState, auth }) => {
-
-  const { status, token } = auth;
+const mapStateToProps = ({ meetingsState, userState }) => {
   const { meetings } = meetingsState;
   const { user } = userState;
   return {
     meetings,
-    status,
-    token,
     user
   };
 };
 
 export default connect(
   mapStateToProps,
-  actions
+  {fetchProfile, fetchMeetings, fetchProfileAndMeetings}
 )(HomePage);

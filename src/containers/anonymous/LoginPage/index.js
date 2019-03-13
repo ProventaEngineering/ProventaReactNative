@@ -18,7 +18,7 @@ import {
 import PageStyle from "./styles";
 import { DrawerActions } from "react-navigation";
 import { connect } from "react-redux";
-import { login, updateAuth } from "../../../actions";
+import { login, updateAuth, loginAndFetchData } from "../../../actions";
 // import { GoogleSignin, statusCodes } from "react-native-google-signin";
 
 class LoginPage extends Component {
@@ -122,15 +122,18 @@ class LoginPage extends Component {
   }
 
   loginUser() {
-    const { emailAddress, password, status, navigation, token } = this.props;
+    const { emailAddress, password, status, navigation, token, user, meetings } = this.props;
     const data = {
       email: this.props.emailAddress.value,
       password: this.props.password.value
     };
-    this.props.login(data);
-    if (status === 'loggedin') {
+    this.props.loginAndFetchData(data);
+    if (status === 'loggedin' && user.hasProfileLoaded && meetings.hasMeetingsLoaded) {
       this.storeToken(token);
-      navigation.navigate("MeetingPage", { meetingId: 35, status });
+      const meetingId = user.profile.meetingIds.count > 0 ? user.profile.meetingIds[0] : meetings.ids[0];
+      navigation.navigate("MeetingLoginPage", {status: "loggedin", meetingId: meetingId});
+
+
     }
   }
 
@@ -167,13 +170,14 @@ class LoginPage extends Component {
   }
 }
 
-const mapStatetoProps = ({ auth }) => {
+const mapStateToProps = ({ auth, userState, meetingsState }) => {
   const { status, message, emailAddress, password, token } = auth;
-
-  return { status, message, emailAddress, password, token };
+  const { user } = userState;
+  const { meetings } = meetingsState;
+  return { status, message, emailAddress, password, token, user, meetings };
 };
 
 export default connect(
-  mapStatetoProps,
-  { login, updateAuth }
+  mapStateToProps,
+  { login, updateAuth, loginAndFetchData }
 )(LoginPage);

@@ -23,11 +23,13 @@ export default function (state = INITIAL_STATE, action) {
     case MESSAGE_UPDATE:
       return { ...state, [action.payload.prop]: action.payload };
     case FETCH_MEETINGS_REQUEST:
+      console.log(">>>>>>>>>>>>>>>>>>>>>FETCH_MEETINGS_REQUEST");
       return {
         ...state,
         meetings: {items: [], hasMeetingsLoaded: false},
       };
     case FETCH_MEETINGS_RESPONSE:
+      console.log(">>>>>>>>>>>>>>>>>>>>>FETCH_MEETINGS_RESPONSE");
       return {
         ...state,
         meetings: {

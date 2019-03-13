@@ -5,10 +5,11 @@ import {
   AUTH_LOGIN_SUCCESS,
   AUTH_LOGIN_FAIL,
   AUTH_LOGOUT,
-  SERVER_ADDRESS
+  SERVER_ADDRESS, AUTH_CHECK_STATUS
 } from "./types";
 
 import axios from "axios";
+import {failedFetchProfileAndMeeting, fetchProfileAndMeetings} from "./UserActions";
 import AsyncStorage from "react-native";
 
 // Update emailAddress and password field
@@ -64,6 +65,10 @@ export const signUp = data => async dispatch => {
     error;
   }
 };
+export const loginAndFetchData = (data) => async dispatch => {
+  dispatch(login(data)).then( token => dispatch(fetchProfileAndMeetings(token)));
+}
+
 
 export const login = (data) => async dispatch => {
   try {
@@ -83,7 +88,7 @@ export const login = (data) => async dispatch => {
         payload: "Login Failed"
       });
     }
-
+    return request.data.auth_token;
     //This is called after the POST function is done
     // For UI trigger
     // callback();

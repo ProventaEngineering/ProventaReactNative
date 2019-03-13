@@ -24,23 +24,23 @@ class MeetingPage extends Component {
     status: "loggedout"
   };
 
-   componentDidMount() {
-    try {
-      const { navigation } = this.props;
-      //set status
-      this.setState({status: navigation.getParam("status")}, ()=> { this.setNavigationMeetingId() });
-      //set meeting id in navigation param if undefined or null
-    } catch (error) {
-      // Error retrieving data
-    }
-  }
+  //  componentDidMount() {
+  //   try {
+  //     const { navigation } = this.props;
+  //     //set status
+  //     this.setState({status: navigation.getParam("status")}, ()=> { this.setNavigationMeetingId() });
+  //     //set meeting id in navigation param if undefined or null
+  //   } catch (error) {
+  //     // Error retrieving data
+  //   }
+  // }
 
   setNavigationMeetingId(){
     const { navigation, user, meetings } = this.props;
     const meetingId = navigation.getParam("meetingId");
     if(meetingId == undefined || meetingId == null){ //set meeting id from profile meeting ids if loggedin or first of ids from meetings ids
-      if(this.state.status == "loggedin" && user.profile.meeting_ids.length > 0){
-        navigation.setParams({meetingId: user.profile.meeting_ids[0]});
+      if(this.state.status == "loggedin" && user.profile.meetingIds.length > 0){
+        navigation.setParams({meetingId: user.profile.meetingIds[0]});
       } else{
         navigation.setParams({meetingId: meetings.ids[0]});
       }
@@ -236,12 +236,13 @@ class MeetingPage extends Component {
   }
 
   render() {
-    const { navigation, meetings} = this.props;
+    const { navigation, meetings, user} = this.props;
+    const status = navigation.getParam("status") != undefined ? navigation.getParam("status") : "loggedout";
     return (
       <View style={PageStyle.container}>
         <Header
           label="MEETING DETAILS"
-          status={this.state.status}
+          status={status}
           settings={() =>
             navigation.navigate("SettingsPage", {
               content: "settings",
@@ -270,7 +271,7 @@ class MeetingPage extends Component {
             <ActivityIndicator loaded={meetings.hasMeetingsLoaded} size="large" />
           </View>
         }
-        <TabbedMenu status={this.state.status} navigation={navigation}/>
+        <TabbedMenu status={status} navigation={navigation}/>
       </View >
     );
   }
