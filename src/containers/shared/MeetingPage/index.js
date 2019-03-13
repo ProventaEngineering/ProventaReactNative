@@ -28,7 +28,6 @@ class MeetingPage extends Component {
     try {
       const { navigation } = this.props;
       //set status
-      console.log(">>>>>>>>>>>>>>>>componentDidMount Status",navigation.getParam("status"));
       this.setState({status: navigation.getParam("status")}, ()=> { this.setNavigationMeetingId() });
       //set meeting id in navigation param if undefined or null
     } catch (error) {
@@ -83,7 +82,6 @@ class MeetingPage extends Component {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    console.log(">>>>>>>>>>>>>>>>>>>renderMeetingPicture", navigation);
     if(meeting != undefined){
       return <Image key={meeting.venue.id} style={PageStyle.image} source={meeting.venue.image} />;
     }
@@ -239,7 +237,6 @@ class MeetingPage extends Component {
 
   render() {
     const { navigation, meetings} = this.props;
-    console.log(">>>>>>>>>>>MeetingPage status", this.state.status);
     return (
       <View style={PageStyle.container}>
         <Header

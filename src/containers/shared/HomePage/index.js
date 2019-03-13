@@ -33,7 +33,6 @@ class HomePage extends Component {
         this.setState({status: "loggedin"},()=>{
           this.props.fetchProfile(token);
           this.props.fetchMeetings(token);
-          console.log("pasok >>>>>>>>>>>>>>>loggedin");
           this.props.navigation.navigate("MeetingPage", {status: this.state.status});
         })
       }else {

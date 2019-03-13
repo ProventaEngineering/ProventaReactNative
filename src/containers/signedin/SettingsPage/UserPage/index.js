@@ -26,14 +26,12 @@ class UserPage extends Component {
 
   componentDidMount() {
     const { token } = this.props;
-    console.log('dsadddsa', token)
     this.props.fetchProfile(token).then(() => {
       this.loadInitialData();
     })
   }
 
   loadInitialData() {
-    console.log('dsdsdas');
     console.log(this.props.profile);
   }
 

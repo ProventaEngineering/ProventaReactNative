@@ -143,7 +143,6 @@ class InformationDetailsPage extends Component {
     const content = navigation.getParam("content");
     const route = navigation.getParam("previousRoute");
     const meetingId = navigation.getParam("meetingId");
-    console.log(">>>>>>>>>.information Details Page", navigation);
     if(meetings.hasMeetingsLoaded) {
       return (
         <View style={PageStyle.container}>

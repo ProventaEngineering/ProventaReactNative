@@ -17,7 +17,6 @@ class ModalScreen extends Component {
   componentWillReceiveProps() {
     // const { first_name, last_name, position, company, description } = this.props.facilitator;
     const { modalVisible } = this.props;
-    console.log("ModalVisible: >>>>>>>>>>>", modalVisible);
     this.setState({ open: modalVisible });
   }
 

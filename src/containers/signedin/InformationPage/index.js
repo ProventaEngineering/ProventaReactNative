@@ -46,7 +46,6 @@ class InformationPage extends Component {
   renderMenu(menu) {
     const { navigation} = this.props;
     const meetingId = navigation.getParam("meetingId");
-    console.log(">>>>>>>>>>>>>>>>renderMenu meetingId", meetingId);
     const menuItem = menu.map(({ id, image, label, name }) => {
       return (
         <View key={id} style={PageStyle.menuContainer}>
@@ -89,7 +88,6 @@ class InformationPage extends Component {
 
   render() {
     const { navigation} = this.props;
-    console.log(">>>>>>>>>>>>>>>>>>>InformationPage", navigation);
     return (
       <View style={PageStyle.container}>
         <Header

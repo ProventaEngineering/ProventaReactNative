@@ -31,7 +31,6 @@ class TabbedMenu extends Component {
   renderSignedIn() {
     const { navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
-    console.log(">>>>>>>>>>>renderSignedIn meetingId", meetingId);
     if(meetingId !== undefined) {
       return (
         <View style={ComponentStyle.container}>
@@ -118,7 +117,6 @@ class TabbedMenu extends Component {
 
   render() {
     const { status } = this.props;
-    console.log(">>>>>>>>>>>tabbed render", status);
     if (status == "loggedin") {
       return this.renderSignedIn();
     } else return this.renderAnonymous();
