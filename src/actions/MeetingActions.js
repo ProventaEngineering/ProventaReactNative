@@ -27,17 +27,21 @@ import { UserActions } from "../actions";
 axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'PATCH, DELETE, POST, GET, OPTIONS';
 
 //Retrieve meetings
-export const fetchMeetings = () => async dispatch => {
+export const fetchMeetings = (token) => async dispatch => {
   dispatch({type: FETCH_MEETINGS_REQUEST});
 
 
   //get token then fetch meetings
   try {
-    const url = `${SERVER_ADDRESS}/anonymous/meetings`;
+    const url =
+      token != null
+        ? `${SERVER_ADDRESS}/meetings`
+        : `${SERVER_ADDRESS}/anonymous/meetings`;
     const request = await axios.get(
       url, {
         "headers": {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": token
         }
       }
     );

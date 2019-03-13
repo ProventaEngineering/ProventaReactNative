@@ -29,10 +29,10 @@ class TabbedMenu extends Component {
   }
 
   renderSignedIn() {
-    const { navigation, user } = this.props;
-
-    if(user !== undefined && user.hasProfileLoaded) {
-      const meeting = user.profile.meetings[0]
+    const { navigation } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    console.log(">>>>>>>>>>>renderSignedIn meetingId", meetingId);
+    if(meetingId !== undefined) {
       return (
         <View style={ComponentStyle.container}>
           <MenuButton
@@ -41,7 +41,7 @@ class TabbedMenu extends Component {
             label="Menu"
             onPress={() =>
               navigation.navigate("MeetingLoginPage", {
-                meetingId: meeting.id,
+                meetingId: meetingId,
                 status: "loggedin",
                 content: "settings"
               })
@@ -53,7 +53,8 @@ class TabbedMenu extends Component {
             label="Menu"
             onPress={() =>
               navigation.navigate("InformationPage", {
-                status: "loggedin"
+                status: "loggedin",
+                meetingId: meetingId
               })
             }
           />
@@ -64,7 +65,8 @@ class TabbedMenu extends Component {
             onPress={() =>
               navigation.navigate("InformationDetailsPage", {
                 content: 'PERSONAL SCHEDULE',
-                status: "loggedin"
+                status: "loggedin",
+                meetingId: meetingId
               })
             }
           />
@@ -85,11 +87,30 @@ class TabbedMenu extends Component {
     }else{
       return (
         <View style={ComponentStyle.container}>
-          <View style={PageStyle.loading}>
-            <ActivityIndicator loaded={user.hasProfileLoaded} size="large" />
-          </View>
+          <MenuButton
+            image={require("../../assets/search_button.png")}
+            label="Menu"
+            onPress={() => navigation.navigate("SearchPage")}
+          />
+          <MenuButton
+            image={require("../../assets/home_button.png")}
+            label="Menu"
+            onPress={() => navigation.navigate("HomePage")}
+          />
+          <MenuButton
+            image={require("../../assets/login_button.png")}
+            label="Menu"
+            onPress={() => navigation.navigate("LoginPage")}
+          />
         </View>
       );
+      // return (
+      //   <View style={ComponentStyle.container}>
+      //     <View style={PageStyle.loading}>
+      //       <ActivityIndicator loaded={user.hasProfileLoaded} size="large" />
+      //     </View>
+      //   </View>
+      // );
     }
 
 
@@ -97,6 +118,7 @@ class TabbedMenu extends Component {
 
   render() {
     const { status } = this.props;
+    console.log(">>>>>>>>>>>tabbed render", status);
     if (status == "loggedin") {
       return this.renderSignedIn();
     } else return this.renderAnonymous();

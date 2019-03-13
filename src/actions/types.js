@@ -30,6 +30,7 @@ export const USER_UPDATE = "user_update";
 // Getting User Information
 export const FETCH_PROFILE_REQUEST = "fetch_profile_request";
 export const FETCH_PROFILE_RESPONSE = "fetch_profile_response";
+export const FETCH_PROFILE_FAILED = "fetch_profile_failed";
 
 // Updating User Information
 export const PROFILE_UPDATE_SUCCESS = "profile_update_success";

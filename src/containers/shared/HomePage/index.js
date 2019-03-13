@@ -31,7 +31,10 @@ class HomePage extends Component {
       const token = await AsyncStorage.getItem("token");
       if(token){
         this.setState({status: "loggedin"},()=>{
-          this.props.fetchProfile();
+          this.props.fetchProfile(token);
+          this.props.fetchMeetings(token);
+          console.log("pasok >>>>>>>>>>>>>>>loggedin");
+          this.props.navigation.navigate("MeetingPage", {status: this.state.status});
         })
       }else {
         this.setState({status: "loggedout"},()=>{
@@ -94,7 +97,6 @@ class HomePage extends Component {
 
   renderMeetings() {
     const { navigation, meetings } = this.props;
-    console.log(meetings.items)
     const meeting = meetings.ids.map((id) => {
       return (
         <View key={id} style={PageStyle.eventList}>

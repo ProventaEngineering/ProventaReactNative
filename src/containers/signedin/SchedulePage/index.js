@@ -64,18 +64,17 @@ class SchedulePage extends Component {
 
 
   renderSessions() {
-    const { navigation, user } = this.props;
-    const meeting = user.profile.meetings[0];
-    const session = meeting.discussions.map((discussion, index, discussions) => {
+    const { navigation, meetings } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const session = meetings.items[meetingId].discussions.map((discussion, index, discussions) => {
       if (discussion.talks.length == 0) {
         return (
           <View key={index} style={PageStyle.ListContainer}>
             <ListItem
               onPress={() => {
                 this.props.navigation.navigate("ScheduleDetailsPage", {
-                  location: discussion.floorPlans[0] ? discussion.floorPlans[0].location : null,
-                  image: discussion.floorPlans[0] ? discussion.floorPlans[0].image.url : null,
-                  label: discussion.title
+                  event: {...discussion},
+                  meetingId: meetingId
                 });
               }}
             >
@@ -122,11 +121,14 @@ class SchedulePage extends Component {
 // }
   renderDropdownList(talks) {
     const { navigation } = this.props;
+    const meetingId = navigation.getParam("meetingId");
     const event = talks.map((talk, index, talks) => {
-      console.log(talk);
       return (
         <View key={index} style={PageStyle.dropdownList}>
-          <ListItem onPress={() => { navigation.navigate("ScheduleDetailsPage", {talk: talk}); }} >
+          <ListItem onPress={() => { navigation.navigate("ScheduleDetailsPage", {
+            event: {...talk},
+            meetingId: meetingId
+          }) }} >
             <View>
               <Text style={PageStyle.title}>{talk.title}</Text>
             </View>
@@ -141,8 +143,9 @@ class SchedulePage extends Component {
   }
 
   render() {
-    const { navigation, user } = this.props;
-    if(user !== undefined && user.hasProfileLoaded) {
+    const { navigation, meetings } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    if(meetings.hasMeetingsLoaded) {
       return (
         <View style={PageStyle.container}>
           <Header
@@ -150,7 +153,8 @@ class SchedulePage extends Component {
             status="details"
             onPress={() => {
               navigation.navigate("InformationPage", {
-                status: "loggedin"
+                status: "loggedin",
+                meetingId: meetingId
               })
             }}
           />
@@ -161,7 +165,7 @@ class SchedulePage extends Component {
             {/* <Text style={PageStyle.header}> AFTERNOON SESSION </Text> */}
             {/* {this.renderSessions('pm')} */}
           </ScrollView>
-          <TabbedMenu navigation={navigation} user={user} status="loggedin"/>
+          <TabbedMenu navigation={navigation} status="loggedin"/>
         </View>
       );
     }else{

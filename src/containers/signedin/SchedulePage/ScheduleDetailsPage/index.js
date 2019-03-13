@@ -13,46 +13,50 @@ class ScheduleDetailsPage extends Component {
 
   renderFacilitator(){
     const { navigation } = this.props;
-    const talk = navigation.getParam("talk");
-    if(talk.facilitators.length > 0){
+    const event = navigation.getParam("event");
+    if( event.facilitator !== null && event.facilitator !== undefined ){
       return(
-        <View style={PageStyle.listContainer}>
-          <ListItem>
-            <View style={PageStyle.speakerContainer}>
-              <View>
-                <Text style={PageStyle.title}>{talk.facilitators[0].first_name + ' ' + talk.facilitators[0].last_name}</Text>
-                <Text style={PageStyle.text}>{talk.facilitators[0].company + ' ' + talk.facilitators[0].position}</Text>
-              </View>
-              <TouchableOpacity onPress={() => Linking.openURL(talk.facilitators[0].linkedin)}>
-                <View style={PageStyle.linkedInContainer}>
-                  <Image
-                    style={PageStyle.linkedInButton}
-                    source={require("../../../../assets/linkedin.png")}
-                  />
+        <Card>
+          <View style={PageStyle.listContainer}>
+            <ListItem>
+              <View style={PageStyle.speakerContainer}>
+                <View>
+                  <Text style={PageStyle.title}>{event.facilitator.first_name + ' ' + event.facilitator.last_name}</Text>
+                  <Text style={PageStyle.text}>{event.facilitator.company + ' ' + event.facilitator.position}</Text>
                 </View>
-              </TouchableOpacity>
+                <TouchableOpacity onPress={() => Linking.openURL(event.facilitator.linkedin)}>
+                  <View style={PageStyle.linkedInContainer}>
+                    <Image
+                      style={PageStyle.linkedInButton}
+                      source={require("../../../../assets/linkedin.png")}
+                    />
+                  </View>
+                </TouchableOpacity>
 
-            </View>
-          </ListItem>
-        </View>
+              </View>
+            </ListItem>
+          </View>
+        </Card>
       );
     }else{
       return(
-        <View style={PageStyle.listContainer}>
-          <ListItem>
-            <View style={PageStyle.speakerContainer}>
-              <Text style={PageStyle.title}>TBA</Text>
-            </View>
-          </ListItem>
-        </View>
+        <Card>
+          <View style={PageStyle.listContainer}>
+            <ListItem>
+              <View style={PageStyle.speakerContainer}>
+                <Text style={PageStyle.title}>TBA</Text>
+              </View>
+            </ListItem>
+          </View>
+        </Card>
       );
     }
 
   }
   renderEventDetails() {
     const { navigation } = this.props;
-    const talk = navigation.getParam("talk");
-    if (talk.topic) {
+    const event = navigation.getParam("event");
+    if (event.topic !== null && event.topic !== undefined ) {
       return (
         <View>
           <Text style={PageStyle.header}>
@@ -60,11 +64,9 @@ class ScheduleDetailsPage extends Component {
           </Text>
           <Card>
             <View style={PageStyle.detailsContainer}>
-              <Text style={PageStyle.title}>{talk.topic}</Text>
-              <Text style={PageStyle.text}>{talk.description}</Text>
+              <Text style={PageStyle.title}>{event.topic}</Text>
+              <Text style={PageStyle.text}>{event.description}</Text>
             </View>
-
-            {this.renderFacilitator()}
           </Card>
         </View>
       );
@@ -74,9 +76,8 @@ class ScheduleDetailsPage extends Component {
 
   renderLocation(){
     const { navigation } = this.props;
-    const talk = navigation.getParam("talk");
-    const floor_plans = talk.floor_plans;
-    if(floor_plans.length > 0){
+    const event = navigation.getParam("event");
+    if(event.floor_plan !== null && event.floor_plan !== undefined){
       return (
         <View>
           <Text style={PageStyle.header}>
@@ -86,14 +87,14 @@ class ScheduleDetailsPage extends Component {
             <View style={PageStyle.locationContainerStyle}>
               <View>
                 <Text style={PageStyle.title}>
-                  {floor_plans[0].location}
+                  {event.floor_plan.location}
                 </Text>
               </View>
               <View>
                 <Image source={require("../../../../assets/checkin_button.png")} style={PageStyle.locationIconStyle} />
               </View>
             </View>
-            {floor_plans[0].image !== undefined && <Image source={floor_plans[0].image.url} style={PageStyle.mapImage} />}
+            {event.floor_plan.image !== undefined && <Image source={event.floor_plan.image.url} style={PageStyle.mapImage} />}
           </Card>
         </View>
       );
@@ -116,12 +117,12 @@ class ScheduleDetailsPage extends Component {
 
   }
   render() {
-    const { navigation, user } = this.props;
-    const talk = navigation.getParam("talk");
+    const { navigation } = this.props;
+    const event = navigation.getParam("event");
     return (
       <View style={PageStyle.container}>
         <Header
-          label={talk.title.toUpperCase()}
+          label={event.title.toUpperCase()}
           status="details"
           onPress={() => {
             navigation.goBack();
@@ -129,9 +130,10 @@ class ScheduleDetailsPage extends Component {
         />
         <ScrollView>
           {this.renderEventDetails()}
+          {this.renderFacilitator()}
           {this.renderLocation()}
         </ScrollView>
-        <TabbedMenu status="loggedin" user={user} navigation={navigation} />
+        <TabbedMenu status="loggedin" navigation={navigation} />
       </View>
     );
   }

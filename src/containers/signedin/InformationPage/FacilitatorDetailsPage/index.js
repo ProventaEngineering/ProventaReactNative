@@ -58,9 +58,8 @@ class FacilitatorDetailsPage extends Component {
   }
 
   render() {
-    const { navigation, user } = this.props;
-    const content = navigation.getParam("content");
-    if(user !== undefined && user.hasProfileLoaded) {
+    const { navigation, meetings } = this.props;
+    if(meetings.hasMeetingsLoaded) {
       return (
         <View style={PageStyle.container}>
           <Header
@@ -71,7 +70,7 @@ class FacilitatorDetailsPage extends Component {
             }}
           />
           {this.renderContent()}
-          <TabbedMenu navigation={navigation} user={user} status="loggedin"/>
+          <TabbedMenu navigation={navigation} status="loggedin"/>
         </View>
       );
     }else{

@@ -28,6 +28,7 @@ class MeetingPage extends Component {
     try {
       const { navigation } = this.props;
       //set status
+      console.log(">>>>>>>>>>>>>>>>componentDidMount Status",navigation.getParam("status"));
       this.setState({status: navigation.getParam("status")}, ()=> { this.setNavigationMeetingId() });
       //set meeting id in navigation param if undefined or null
     } catch (error) {
@@ -39,8 +40,8 @@ class MeetingPage extends Component {
     const { navigation, user, meetings } = this.props;
     const meetingId = navigation.getParam("meetingId");
     if(meetingId == undefined || meetingId == null){ //set meeting id from profile meeting ids if loggedin or first of ids from meetings ids
-      if(this.state.status == "loggedin" && user.meeting_ids.length > 0){
-        navigation.setParams({meetingId: user.meeting_ids[0]});
+      if(this.state.status == "loggedin" && user.profile.meeting_ids.length > 0){
+        navigation.setParams({meetingId: user.profile.meeting_ids[0]});
       } else{
         navigation.setParams({meetingId: meetings.ids[0]});
       }
@@ -52,87 +53,102 @@ class MeetingPage extends Component {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    return (
-      <Card>
-        {this.renderMeetingPicture()}
-        <View style={PageStyle.info}>
-          <Text style={PageStyle.description}>{meeting.title}</Text>
-          <Text style={PageStyle.date}>{meeting.date}</Text>
-          <Text style={PageStyle.area}> { this.renderVenue() }</Text>
-        </View>
-      </Card>
-    );
+    if(meeting != undefined) {
+      return (
+        <Card>
+          {this.renderMeetingPicture()}
+          <View style={PageStyle.info}>
+            <Text style={PageStyle.description}>{meeting.title}</Text>
+            <Text style={PageStyle.date}>{meeting.date}</Text>
+            <Text style={PageStyle.area}> {this.renderVenue()}</Text>
+          </View>
+        </Card>
+      );
+    }
   }
 
   renderVenue() {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
+    if(meeting.venue != undefined ){
+      return  <Text key={meeting.venue.id}> {meeting.venue.title} </Text>;
+    }else{
+      return  <Text > TBA </Text>;
+    }
 
-    return  <Text key={meeting.venue.id}> {meeting.venue.title} </Text>;
   }
 
   renderMeetingPicture() {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    return <Image key={meeting.venue.id} style={PageStyle.image} source={meeting.venue.image} />;
+    console.log(">>>>>>>>>>>>>>>>>>>renderMeetingPicture", navigation);
+    if(meeting != undefined){
+      return <Image key={meeting.venue.id} style={PageStyle.image} source={meeting.venue.image} />;
+    }
+
   }
 
   renderVideo() {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-
-    return (
-      <Card>
-        <Video videoSource={meeting.video} />
-      </Card>
-    );
+    if(meeting != undefined) {
+      return (
+        <Card>
+          <Video videoSource={meeting.video}/>
+        </Card>
+      );
+    }
   }
 
   renderDescription() {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    return (
-      <Card>
-        <View style={PageStyle.textArea}>
-          <Text style={PageStyle.text}>{meeting.description}</Text>
-        </View>
-      </Card>
-    );
+    if(meeting != undefined) {
+      return (
+        <Card>
+          <View style={PageStyle.textArea}>
+            <Text style={PageStyle.text}>{meeting.description}</Text>
+          </View>
+        </Card>
+      );
+    }
   }
 
   renderExpectations() {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    const expectation = meeting.expectations.map(
-      ({ id, image, title, description }) => {
-        return (
-          <View key={id} style={PageStyle.expectationContainer}>
-            <View style={PageStyle.expectationList}>
-              <View style={{ width: "25%" }}>
-                <Image
-                  style={PageStyle.expectationIcon}
-                  source={{ uri: image.url }}
-                />
+    if(meeting != undefined) {
+      const expectation = meeting.expectations.map(
+        ({id, image, title, description}) => {
+          return (
+            <View key={id} style={PageStyle.expectationContainer}>
+              <View style={PageStyle.expectationList}>
+                <View style={{width: "25%"}}>
+                  <Image
+                    style={PageStyle.expectationIcon}
+                    source={{uri: image.url}}
+                  />
+                </View>
+                <View style={{width: "75%"}}>
+                  <Text style={PageStyle.expectationTitle}>{title}</Text>
+                  <Text style={PageStyle.expectationDescription}>
+                    {description}
+                  </Text>
+                </View>
               </View>
-              <View style={{ width: "75%" }}>
-                <Text style={PageStyle.expectationTitle}>{title}</Text>
-                <Text style={PageStyle.expectationDescription}>
-                  {description}
-                </Text>
-              </View>
+              <View style={PageStyle.expectationBorder}/>
             </View>
-            <View style={PageStyle.expectationBorder} />
-          </View>
-        );
-      }
-    );
+          );
+        }
+      );
 
-    return expectation;
+      return expectation;
+    }
   }
 
   toggleModal() {
@@ -143,63 +159,65 @@ class MeetingPage extends Component {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-
-    const facilitator = meeting.facilitators.map(
-      ({ id, first_name, last_name, position }, index, facilitators) => {
-        return (
-          <View key={id} style={PageStyle.expectationContainer}>
-            <ListItem
-              onPress={() => {
-                this.setState(
-                  {
-                    selectedIndex: index
-                  },
-                  () => {
-                    this.toggleModal();
-                  }
-                );
-              }}
-            >
-              <View style={PageStyle.expectationList}>
-                <View style={{ width: "25%" }}>
-                  <Image
-                    style={[PageStyle.expectationIcon, PageStyle.profileIcon]}
-                    source={{
-                      uri:
-                        "https://cdn5.vectorstock.com/i/thumb-large/13/04/male-profile-picture-vector-2041304.jpg"
-                    }}
-                  />
+    if(meeting != undefined) {
+      const facilitator = meeting.facilitators.map(
+        ({id, first_name, last_name, position}, index, facilitators) => {
+          return (
+            <View key={id} style={PageStyle.expectationContainer}>
+              <ListItem
+                onPress={() => {
+                  this.setState(
+                    {
+                      selectedIndex: index
+                    },
+                    () => {
+                      this.toggleModal();
+                    }
+                  );
+                }}
+              >
+                <View style={PageStyle.expectationList}>
+                  <View style={{width: "25%"}}>
+                    <Image
+                      style={[PageStyle.expectationIcon, PageStyle.profileIcon]}
+                      source={{
+                        uri:
+                          "https://cdn5.vectorstock.com/i/thumb-large/13/04/male-profile-picture-vector-2041304.jpg"
+                      }}
+                    />
+                  </View>
+                  <View style={{width: "75%"}}>
+                    <Text style={PageStyle.expectationTitle}>
+                      {first_name} {last_name}
+                    </Text>
+                    <Text style={PageStyle.expectationDescription}>
+                      {position}
+                    </Text>
+                  </View>
                 </View>
-                <View style={{ width: "75%" }}>
-                  <Text style={PageStyle.expectationTitle}>
-                    {first_name} {last_name}
-                  </Text>
-                  <Text style={PageStyle.expectationDescription}>
-                    {position}
-                  </Text>
-                </View>
-              </View>
-              <View style={PageStyle.expectationBorder} />
-            </ListItem>
-            <ModalScreen
-              facilitator={this.state.selectedIndex == null ? facilitators[0]: facilitators[this.state.selectedIndex]}
-              modalVisible={this.state.modalVisible}
-            />
-          </View>
-        );
-      }
-    );
+                <View style={PageStyle.expectationBorder}/>
+              </ListItem>
+              <ModalScreen
+                facilitator={this.state.selectedIndex == null ? facilitators[0] : facilitators[this.state.selectedIndex]}
+                modalVisible={this.state.modalVisible}
+              />
+            </View>
+          );
+        }
+      );
 
       return facilitator;
-
+    }
   }
 
   renderMap() {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-
-    return <Map key={meeting.venue.id} latitude={meeting.venue.latitude} longitude={meeting.venue.longitude} title={meeting.venue.title} />;
+    if(meeting != undefined) {
+      return <Map key={meeting.venue.id} latitude={meeting.venue.latitude} longitude={meeting.venue.longitude}
+                  title={meeting.venue.title}/>;
+    }
   }
 
   renderDetails() {
@@ -221,7 +239,7 @@ class MeetingPage extends Component {
 
   render() {
     const { navigation, meetings} = this.props;
-
+    console.log(">>>>>>>>>>>MeetingPage status", this.state.status);
     return (
       <View style={PageStyle.container}>
         <Header
@@ -255,7 +273,6 @@ class MeetingPage extends Component {
             <ActivityIndicator loaded={meetings.hasMeetingsLoaded} size="large" />
           </View>
         }
-
         <TabbedMenu status={this.state.status} navigation={navigation}/>
       </View >
     );

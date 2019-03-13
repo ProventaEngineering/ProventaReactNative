@@ -9,28 +9,11 @@ import ComponentStyle from "../../../../components/TabbedMenu/styles";
 
 class InformationDetailsPage extends Component {
 
-  // async componentWillMount() {
-  //   try {
-  //     const { navigation } = this.props;
-  //     const token = await AsyncStorage.getItem('token');
-  //     if (token !== null) {
-  //       this.props.updateStatus(token).then(() => {
-  //         const { status } = this.props;
-  //         this.props.fetchFacilitators(35, "loggedin", token);
-  //         this.props.fetchParticipants(35, "loggedin", token);
-  //         this.props.fetchSponsors(35, "loggedin", token);
-  //         this.props.fetchFloorPlans(35, "loggedin", token);
-  //       })
-  //     }
-  //
-  //   } catch (error) {
-  //     // Error retrieving data
-  //   }
-  // }
 
   renderFacilitators() {
-    const { navigation, user } = this.props;
-    const meeting = user.profile.meetings[0];
+    const { navigation, meetings } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
     const facilitator = meeting.facilitators.map(({ id, first_name, last_name, company, position }, index, facilitators) => {
       return (
         <View key={id} style={PageStyle.listContainer}>
@@ -43,7 +26,8 @@ class InformationDetailsPage extends Component {
                 },
                 () => {
                   navigation.navigate("FacilitatorDetailsPage", {
-                    facilitator: facilitators[index]
+                    facilitator: facilitators[index],
+                    meetingId: meetingId
                   });
                 });
             }}
@@ -69,8 +53,9 @@ class InformationDetailsPage extends Component {
   }
 
   renderParticipants() {
-    const { navigation, user } = this.props;
-    const meeting = user.profile.meetings[0];
+    const { navigation, meetings } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
     // const participants = navigation.getParam("participants");
     const participant = meeting.participants.map(({ id, first_name, last_name, position, company, linkedin }, index, participants) => {
       return (
@@ -105,8 +90,9 @@ class InformationDetailsPage extends Component {
   }
 
   renderSponsors() {
-    const { navigation, user } = this.props;
-    const meeting = user.profile.meetings[0];
+    const { navigation, meetings } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
     const sponsor = meeting.sponsors.map(({ id, title, image, website }) => {
       return (
         <View key={id} style={{ width: "45%", alignItems: "flex-start" }}>
@@ -153,11 +139,12 @@ class InformationDetailsPage extends Component {
 
 
   render() {
-    const { navigation, status, user } = this.props;
+    const { navigation, meetings } = this.props;
     const content = navigation.getParam("content");
     const route = navigation.getParam("previousRoute");
-    if(user != undefined && user.hasProfileLoaded) {
-      const meeting = user.profile.meetings[0];
+    const meetingId = navigation.getParam("meetingId");
+    console.log(">>>>>>>>>.information Details Page", navigation);
+    if(meetings.hasMeetingsLoaded) {
       return (
         <View style={PageStyle.container}>
           <Header
@@ -168,7 +155,7 @@ class InformationDetailsPage extends Component {
                 navigation.dispatch(DrawerActions.openDrawer());
               } else {
                 navigation.navigate(route, {
-                  meetingId: meeting.id,
+                  meetingId: meetingId,
                   status: "loggedin"
                 });
               }
@@ -176,7 +163,7 @@ class InformationDetailsPage extends Component {
             settings={() => {
               if (content !== "PERSONAL SCHEDULE") {
                 navigation.navigate("SettingsPage", {
-                  meetingId: meeting.id,
+                  meetingId: meetingId,
                   content: "settings",
                   previousRoute: "MeetingLoginPage"
                 });
@@ -184,14 +171,14 @@ class InformationDetailsPage extends Component {
             }}
           />
           {this.renderContent()}
-          <TabbedMenu navigation={navigation} user={user} status="loggedin"/>
+          <TabbedMenu navigation={navigation} status="loggedin"/>
         </View>
       );
     }else{
       return (
         <View style={ComponentStyle.container}>
           <View style={PageStyle.loading}>
-            <ActivityIndicator loaded={user.hasProfileLoaded} size="large" />
+            <ActivityIndicator loaded={meetings.hasMeetingsLoaded} size="large" />
           </View>
         </View>
       );

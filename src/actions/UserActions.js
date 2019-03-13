@@ -2,9 +2,10 @@ import {
   USER_UPDATE,
   FETCH_PROFILE_REQUEST,
   FETCH_PROFILE_RESPONSE,
+  FETCH_PROFILE_FAILED,
   PROFILE_UPDATE_SUCCESS,
   PROFILE_UPDATE_FAIL,
-  SERVER_ADDRESS, FETCH_MEETING
+  SERVER_ADDRESS, FETCH_MEETING, FETCH_MEETINGS_FAILED
 } from "./types"
   ;
 import axios from "axios";
@@ -20,24 +21,24 @@ export const updateUser = ({ prop, value }) => {
 
 //Retrieve user profile
 
-export const fetchProfile = () => async dispatch => {
+export const fetchProfile = (token) => async dispatch => {
     dispatch({type: FETCH_PROFILE_REQUEST});
     const url = `${SERVER_ADDRESS}/profile`;
     try {
-      const token = await AsyncStorage.getItem('token');
-        const request = await axios.get(url, {
-            "headers": {
-                "Content-Type": "application/json",
-                "Authorization": token
-            }
-        });
-        const profile = await request.data;
-        dispatch({
-            type: FETCH_PROFILE_RESPONSE,
-            payload: {...profile.data.attributes, ...{"token": token}}
-        });
+      const request = await axios.get(url, {
+          "headers": {
+              "Content-Type": "application/json",
+              "Authorization": token
+          }
+      });
+      const profile = await request.data;
+      dispatch({
+          type: FETCH_PROFILE_RESPONSE,
+          payload: {...profile.data.attributes, ...{"token": token}}
+      });
     } catch (error) {
         console.log(error);
+        dispatch({ type: FETCH_PROFILE_FAILED, payload: {message: e.toString()}, error: true });
     }
 };
 

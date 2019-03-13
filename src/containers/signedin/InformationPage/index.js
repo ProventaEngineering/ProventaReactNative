@@ -44,12 +44,9 @@ class InformationPage extends Component {
 
 
   renderMenu(menu) {
-    const { navigation, user, status } = this.props;
-    const meeting = {id: null}
-    if(user !== undefined && user.hasProfileLoaded) {
-      meeting.id = user.profile.meetings[0].id
-    }
-
+    const { navigation} = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    console.log(">>>>>>>>>>>>>>>>renderMenu meetingId", meetingId);
     const menuItem = menu.map(({ id, image, label, name }) => {
       return (
         <View key={id} style={PageStyle.menuContainer}>
@@ -58,12 +55,14 @@ class InformationPage extends Component {
               if (name !== 'SCHEDULE') {
                 navigation.navigate("InformationDetailsPage", {
                   content: name,
-                  status: status,
-                  previousRoute: 'InformationPage'
+                  status: "loggedin",
+                  previousRoute: 'InformationPage',
+                  meetingId: meetingId
                 })
               } else {
                 navigation.navigate("SchedulePage", {
-                  meetingId: meeting.id,
+                  meetingId: meetingId,
+                  previousRoute: 'InformationPage',
                   status: "loggedin"
                 })
               }
@@ -89,7 +88,8 @@ class InformationPage extends Component {
 
 
   render() {
-    const { navigation, user } = this.props;
+    const { navigation} = this.props;
+    console.log(">>>>>>>>>>>>>>>>>>>InformationPage", navigation);
     return (
       <View style={PageStyle.container}>
         <Header
@@ -106,7 +106,7 @@ class InformationPage extends Component {
           }}
         />
         <Card>{this.renderMenu(this.state.menu)}</Card>
-        <TabbedMenu navigation={navigation} user={user} status="loggedin" />
+        <TabbedMenu navigation={navigation} status="loggedin" />
       </View>
     );
   }
