@@ -76,13 +76,15 @@ class SettingsPage extends Component {
 
   renderSettingsItems(settings) {
     const { navigation } = this.props;
+    const meetingId = navigation.getParam("meetingId");
     const settingsItem = settings.map(({ id, icon, label, name, route }) => {
       return (
         <View key={id}>
           <ListItem
             onPress={() => {
               if (name !== "LOG OUT") {
-                navigation.navigate(route, { meetingId: 35, content: name, status: "loggedin" })
+                console.log(">>>>>>>>>>>>>>>Setting", route)
+                navigation.navigate(route, { meetingId: meetingId, content: name, status: "loggedin" })
               }
               else if (name === "LOG OUT") {
                 this.clearToken().then(() => {
@@ -111,6 +113,7 @@ class SettingsPage extends Component {
   render() {
     const { navigation } = this.props;
     const route = navigation.getParam("previousRoute");
+    const meetingId = navigation.getParam("meetingId");
     return (
       <View style={PageStyle.container}>
         <Header
@@ -118,7 +121,8 @@ class SettingsPage extends Component {
           status="details"
           onPress={() => {
             navigation.navigate(route, {
-              status: "loggedin"
+              status: "loggedin",
+              meetingId: meetingId
             });
           }}
         />

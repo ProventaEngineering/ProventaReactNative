@@ -24,19 +24,21 @@ class UserPage extends Component {
   //   });
   // }
 
-  componentDidMount() {
-    const { token } = this.props;
-    this.props.fetchProfile(token).then(() => {
-      this.loadInitialData();
-    })
-  }
+  // componentDidMount() {
+  //   const { token } = this.props;
+  //   this.props.fetchProfile(token).then(() => {
+  //     this.loadInitialData();
+  //   })
+  // }
 
-  loadInitialData() {
-    console.log(this.props.profile);
-  }
+  // loadInitialData() {
+  //   console.log(this.props.profile);
+  // }
 
   render() {
-    const { navigation, profile } = this.props;
+    const { navigation, user } = this.props;
+    console.log(">>>>>>>>>>>>>>>user", user)
+    console.log(">>>>>>>>>>>>>>>user", navigation)
     return (
       <View style={PageStyle.container}>
         <Header
@@ -51,38 +53,38 @@ class UserPage extends Component {
             <View style={PageStyle.inputContainer}>
               <InputBox
                 label="First Name"
-                placeholder="John"
-                value={profile.firstName}
+                placeholder={user.profile.firstName}
+                value={user.profile.firstName}
                 onChangeText={() => console.log("first name")}
               />
               <InputBox
                 label="Last Name"
-                placeholder="Smith"
-                value={profile.lastName}
+                placeholder={user.profile.lastName}
+                value={user.profile.lastName}
                 onChangeText={() => console.log("last name")}
               />
               <InputBox
                 label="Email Address"
-                placeholder="proventa@proventa.com"
-                value={profile.email}
+                placeholder={user.profile.email}
+                value={user.profile.email}
                 onChangeText={() => console.log("email address")}
               />
               <InputBox
                 label="Position"
-                placeholder="CEO"
-                value={profile.position}
+                placeholder={user.profile.position}
+                value={user.profile.position}
                 onChangeText={() => console.log("Position")}
               />
               <InputBox
                 label="Company"
-                placeholder="Proventa International"
-                value={profile.company}
+                placeholder={user.profile.company}
+                value={user.profile.company}
                 onChangeText={() => console.log("Company")}
               />
               <InputBox
                 label="Contact Number"
-                placeholder="+63998 217 5566"
-                value={profile.contactNumber}
+                placeholder={user.profile.contactNumber}
+                value={user.profile.contactNumber}
                 onChangeText={() => console.log("Contact Number")}
               />
               <MainButton label="UPDATE" />
@@ -95,10 +97,10 @@ class UserPage extends Component {
   }
 }
 
-const mapStatetoProps = ({ user, auth }) => {
-  const { profile } = user;
+const mapStatetoProps = ({ userState, auth }) => {
+  const { user } = userState;
   const { token } = auth;
-  return { token, profile }
+  return { token, user }
 }
 
 export default connect(mapStatetoProps, { fetchProfile })(UserPage);
