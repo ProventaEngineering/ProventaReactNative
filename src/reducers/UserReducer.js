@@ -9,7 +9,8 @@ import {
 const INITIAL_STATE = {
   user: {
     profile: {},
-    hasProfileLoaded: false
+    hasProfileLoaded: false,
+    hasProfileUpdated: false
   }
 };
 
@@ -19,12 +20,13 @@ export default function (state = INITIAL_STATE, action) {
       return { ...state, [action.payload.prop]: action.payload };
     case FETCH_PROFILE_REQUEST:
       console.log(">>>>>>>>>>>>>>>>>>>>>FETCH_PROFILE_REQUEST");
-      return { ...state, user: {profile: {}, hasProfileLoaded: false}};
+      return { ...state, user: { profile: {}, hasProfileLoaded: false } };
     case FETCH_PROFILE_RESPONSE:
       console.log(">>>>>>>>>>>>>>>>>>>>>FETCH_PROFILE_RESPONSE");
-      return { ...state, user: {profile: action.payload, hasProfileLoaded: true}};
+      return { ...state, user: { profile: action.payload, hasProfileLoaded: true } };
     case PROFILE_UPDATE_SUCCESS:
-      return { ...state, message: action.payload };
+      console.log(">>>>>>>>>>>>>>>>>>>>>PROFILE_UPDATE_SUCCESS");
+      return { ...state, user: { profile: action.payload, hasProfileUpdated: true } };
     case PROFILE_UPDATE_FAIL:
       return { ...state, message: action.payload };
     default:

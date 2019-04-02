@@ -4,13 +4,14 @@ import ComponentStyle from "./styles";
 
 class InputBox extends Component {
   render() {
-    const { label, placeholder, onChangeText } = this.props;
+    const { label, placeholder, value, onChangeText } = this.props;
     return (
       <View style={ComponentStyle.container}>
         <Text style={ComponentStyle.label}> {label}</Text>
         <TextInput
           style={ComponentStyle.input}
           placeholder={placeholder}
+          value={value}
           onChangeText={onChangeText}
         />
       </View>

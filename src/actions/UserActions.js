@@ -9,8 +9,8 @@ import {
 } from "./types"
   ;
 import axios from "axios";
-import {fetchMeetings} from "./MeetingActions";
-import {AsyncStorage} from "react-native";
+import { fetchMeetings } from "./MeetingActions";
+import { AsyncStorage } from "react-native";
 
 //Update emailAddress and password field
 export const updateUser = ({ prop, value }) => {
@@ -24,36 +24,58 @@ export const updateUser = ({ prop, value }) => {
 export const fetchProfileAndMeetings = (token) => async dispatch => {
   try {
     return dispatch(fetchProfile(token)).then(() => dispatch(fetchMeetings(token)));
-  }catch (e){
+  } catch (e) {
     failedFetchProfileAndMeeting(e)
   }
 
 };
 
 export const failedFetchProfileAndMeeting = (e) => async dispatch => {
-  dispatch({ type: FETCH_PROFILE_FAILED, payload: {message: e.toString()}, error: true });
-  dispatch({ type: FETCH_MEETINGS_FAILED, payload: {message: e.toString()}, error: true })
+  dispatch({ type: FETCH_PROFILE_FAILED, payload: { message: e.toString() }, error: true });
+  dispatch({ type: FETCH_MEETINGS_FAILED, payload: { message: e.toString() }, error: true })
 }
 export const fetchProfile = (token) => async dispatch => {
 
-    dispatch({type: FETCH_PROFILE_REQUEST});
-    const url = `${SERVER_ADDRESS}/profile`;
-    try {
-      const request = await axios.get(url, {
-          "headers": {
-              "Content-Type": "application/json",
-              "Authorization": token
-          }
-      });
-      const profile = await request.data;
-      dispatch({
-          type: FETCH_PROFILE_RESPONSE,
-          payload: {...profile.data.attributes, ...{"token": token}}
-      });
-    } catch (error) {
-        console.log(error);
-        dispatch({ type: FETCH_PROFILE_FAILED, payload: {message: e.toString()}, error: true });
-    }
+  dispatch({ type: FETCH_PROFILE_REQUEST });
+  const url = `${SERVER_ADDRESS}/profile`;
+  try {
+    const request = await axios.get(url, {
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": token
+      }
+    });
+    const profile = await request.data;
+    dispatch({
+      type: FETCH_PROFILE_RESPONSE,
+      payload: { ...profile.data.attributes, ...{ "token": token } }
+    });
+  } catch (error) {
+    console.log(error);
+    dispatch({ type: FETCH_PROFILE_FAILED, payload: { message: e.toString() }, error: true });
+  }
+};
+
+
+
+export const updateProfile = (payload, token) => async dispatch => {
+  const url = `${SERVER_ADDRESS}/profile`;
+  try {
+    const request = await axios.patch(url, payload, {
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": token
+      }
+    });
+    const profile = await request.data;
+    dispatch({
+      type: PROFILE_UPDATE_SUCCESS,
+      payload: { ...profile.data.attributes }
+    });
+  } catch (error) {
+    console.log(error);
+    dispatch({ type: PROFILE_UPDATE_FAIL, payload: { message: error.toString() }, error: true });
+  }
 };
 
 // export const fetchProfile = (token) => async dispatch => {

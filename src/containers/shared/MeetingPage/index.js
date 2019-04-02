@@ -24,25 +24,26 @@ class MeetingPage extends Component {
     status: "loggedout"
   };
 
-   componentDidMount() {
+  componentDidMount() {
     try {
       const { navigation } = this.props;
       //set status
-      this.setState({status: navigation.getParam("status")}, ()=> { this.setNavigationMeetingId() });
+      this.setState({ status: navigation.getParam("status") }, () => { this.setNavigationMeetingId() });
       //set meeting id in navigation param if undefined or null
     } catch (error) {
       // Error retrieving data
     }
   }
 
-  setNavigationMeetingId(){
+  setNavigationMeetingId() {
     const { navigation, user, meetings } = this.props;
     const meetingId = navigation.getParam("meetingId");
-    if(meetingId == undefined || meetingId == null){ //set meeting id from profile meeting ids if loggedin or first of ids from meetings ids
-      if(this.state.status == "loggedin" && user.profile.meetingIds.length > 0){
-        navigation.setParams({meetingId: user.profile.meetingIds[0]});
-      } else{
-        navigation.setParams({meetingId: meetings.ids[0]});
+    console.log("user", user);
+    if (meetingId == undefined || meetingId == null) { //set meeting id from profile meeting ids if loggedin or first of ids from meetings ids
+      if (this.state.status == "loggedin" && user.profile.meetingIds.length > 0) {
+        navigation.setParams({ meetingId: user.profile.meetingIds[0] });
+      } else {
+        navigation.setParams({ meetingId: meetings.ids[0] });
       }
 
     }
@@ -52,7 +53,7 @@ class MeetingPage extends Component {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    if(meeting != undefined) {
+    if (meeting != undefined) {
       return (
         <Card>
           {this.renderMeetingPicture()}
@@ -70,10 +71,10 @@ class MeetingPage extends Component {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    if(meeting.venue != undefined ){
-      return  <Text key={meeting.venue.id}> {meeting.venue.title} </Text>;
-    }else{
-      return  <Text > TBA </Text>;
+    if (meeting.venue != undefined) {
+      return <Text key={meeting.venue.id}> {meeting.venue.title} </Text>;
+    } else {
+      return <Text > TBA </Text>;
     }
 
   }
@@ -82,7 +83,7 @@ class MeetingPage extends Component {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    if(meeting != undefined){
+    if (meeting != undefined) {
       return <Image key={meeting.venue.id} style={PageStyle.image} source={meeting.venue.image} />;
     }
 
@@ -92,10 +93,10 @@ class MeetingPage extends Component {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    if(meeting != undefined) {
+    if (meeting != undefined) {
       return (
         <Card>
-          <Video videoSource={meeting.video}/>
+          <Video videoSource={meeting.video} />
         </Card>
       );
     }
@@ -105,7 +106,7 @@ class MeetingPage extends Component {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    if(meeting != undefined) {
+    if (meeting != undefined) {
       return (
         <Card>
           <View style={PageStyle.textArea}>
@@ -120,26 +121,26 @@ class MeetingPage extends Component {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    if(meeting != undefined) {
+    if (meeting != undefined) {
       const expectation = meeting.expectations.map(
-        ({id, image, title, description}) => {
+        ({ id, image, title, description }) => {
           return (
             <View key={id} style={PageStyle.expectationContainer}>
               <View style={PageStyle.expectationList}>
-                <View style={{width: "25%"}}>
+                <View style={{ width: "25%" }}>
                   <Image
                     style={PageStyle.expectationIcon}
-                    source={{uri: image.url}}
+                    source={{ uri: image.url }}
                   />
                 </View>
-                <View style={{width: "75%"}}>
+                <View style={{ width: "75%" }}>
                   <Text style={PageStyle.expectationTitle}>{title}</Text>
                   <Text style={PageStyle.expectationDescription}>
                     {description}
                   </Text>
                 </View>
               </View>
-              <View style={PageStyle.expectationBorder}/>
+              <View style={PageStyle.expectationBorder} />
             </View>
           );
         }
@@ -157,9 +158,9 @@ class MeetingPage extends Component {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    if(meeting != undefined) {
+    if (meeting != undefined) {
       const facilitator = meeting.facilitators.map(
-        ({id, first_name, last_name, position}, index, facilitators) => {
+        ({ id, first_name, last_name, position }, index, facilitators) => {
           return (
             <View key={id} style={PageStyle.expectationContainer}>
               <ListItem
@@ -175,7 +176,7 @@ class MeetingPage extends Component {
                 }}
               >
                 <View style={PageStyle.expectationList}>
-                  <View style={{width: "25%"}}>
+                  <View style={{ width: "25%" }}>
                     <Image
                       style={[PageStyle.expectationIcon, PageStyle.profileIcon]}
                       source={{
@@ -184,7 +185,7 @@ class MeetingPage extends Component {
                       }}
                     />
                   </View>
-                  <View style={{width: "75%"}}>
+                  <View style={{ width: "75%" }}>
                     <Text style={PageStyle.expectationTitle}>
                       {first_name} {last_name}
                     </Text>
@@ -193,7 +194,7 @@ class MeetingPage extends Component {
                     </Text>
                   </View>
                 </View>
-                <View style={PageStyle.expectationBorder}/>
+                <View style={PageStyle.expectationBorder} />
               </ListItem>
               <ModalScreen
                 facilitator={this.state.selectedIndex == null ? facilitators[0] : facilitators[this.state.selectedIndex]}
@@ -212,9 +213,9 @@ class MeetingPage extends Component {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    if(meeting != undefined) {
+    if (meeting != undefined) {
       return <Map key={meeting.venue.id} latitude={meeting.venue.latitude} longitude={meeting.venue.longitude}
-                  title={meeting.venue.title}/>;
+        title={meeting.venue.title} />;
     }
   }
 
@@ -236,7 +237,7 @@ class MeetingPage extends Component {
   }
 
   render() {
-    const { navigation, meetings, user} = this.props;
+    const { navigation, meetings, user } = this.props;
     const status = navigation.getParam("status") != undefined ? navigation.getParam("status") : "loggedout";
     const meetingId = navigation.getParam("meetingId");
     return (
@@ -274,7 +275,7 @@ class MeetingPage extends Component {
             <ActivityIndicator loaded={meetings.hasMeetingsLoaded} size="large" />
           </View>
         }
-        <TabbedMenu status={status} navigation={navigation}/>
+        <TabbedMenu status={status} navigation={navigation} />
       </View >
     );
   }
@@ -285,7 +286,7 @@ const mapStatetoProps = ({ meetingsState, auth, userState }) => {
   const { user } = userState;
   const { status, token } = auth;
   return {
-      meetings, status, user, token
+    meetings, status, user, token
   };
 };
 export default connect(

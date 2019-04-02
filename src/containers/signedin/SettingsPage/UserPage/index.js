@@ -3,42 +3,39 @@ import { View, Text, ScrollView, AsyncStorage } from "react-native";
 import { Header, InputBox, TabbedMenu, Card, MainButton } from "../../../../components";
 import PageStyle from "./styles";
 import { connect } from "react-redux";
-import { fetchProfile } from "../../../../actions";
+import { fetchProfile, updateProfile } from "../../../../actions";
 
 class UserPage extends Component {
-  // state = {
-  //   userProfile: {
-  //     firstName: "",
-  //     lastName: "",
-  //     email: "",
-  //     position: "",
-  //     company: "",
-  //     contactNumber: ""
-  //   }
-  // }
 
-  // componentDidMount() {
-  //   const { token } = this.props;
-  //   this.props.fetchProfile(token).then(() => {
-  //     this.loadInitialData()
-  //   });
-  // }
 
-  // componentDidMount() {
-  //   const { token } = this.props;
-  //   this.props.fetchProfile(token).then(() => {
-  //     this.loadInitialData();
-  //   })
-  // }
+  constructor(props) {
+    super(props);
+    this.state = {
+      firstName: "",
+      lastName: "",
+      email: "",
+      position: "",
+      company: "",
+      contactNumber: ""
+    }
 
-  // loadInitialData() {
-  //   console.log(this.props.profile);
-  // }
+  }
+
+  componentWillMount() {
+    const { navigation, user } = this.props;
+    this.setState({
+      firstName: user.profile.firstName,
+      lastName: user.profile.lastName,
+      email: user.profile.email,
+      position: user.profile.position,
+      company: user.profile.company,
+      contactNumber: user.profile.contactNumber
+    })
+  }
 
   render() {
     const { navigation, user } = this.props;
-    console.log(">>>>>>>>>>>>>>>user", user)
-    console.log(">>>>>>>>>>>>>>>user", navigation)
+    console.log("dsdsdsd", user.profile);
     return (
       <View style={PageStyle.container}>
         <Header
@@ -53,41 +50,40 @@ class UserPage extends Component {
             <View style={PageStyle.inputContainer}>
               <InputBox
                 label="First Name"
-                placeholder={user.profile.firstName}
-                value={user.profile.firstName}
-                onChangeText={() => console.log("first name")}
+                value={this.state.firstName}
+                onChangeText={(input) => this.setState({ firstName: input })}
               />
               <InputBox
                 label="Last Name"
-                placeholder={user.profile.lastName}
-                value={user.profile.lastName}
-                onChangeText={() => console.log("last name")}
+                value={this.state.lastName}
+                onChangeText={(input) => this.setState({ lastName: input })}
               />
               <InputBox
                 label="Email Address"
-                placeholder={user.profile.email}
-                value={user.profile.email}
-                onChangeText={() => console.log("email address")}
+                value={this.state.email}
+                onChangeText={(input) => this.setState({ email: input })}
               />
               <InputBox
                 label="Position"
-                placeholder={user.profile.position}
-                value={user.profile.position}
-                onChangeText={() => console.log("Position")}
+                value={this.state.position}
+                onChangeText={(position) => this.setState({ position: input })}
               />
               <InputBox
                 label="Company"
-                placeholder={user.profile.company}
-                value={user.profile.company}
-                onChangeText={() => console.log("Company")}
+                value={this.state.company}
+                onChangeText={(input) => this.setState({ company: input })}
               />
               <InputBox
                 label="Contact Number"
-                placeholder={user.profile.contactNumber}
-                value={user.profile.contactNumber}
-                onChangeText={() => console.log("Contact Number")}
+                value={this.state.contactNumber}
+                onChangeText={(input) => this.setState({ contactNumber: input })}
               />
-              <MainButton label="UPDATE" />
+              <MainButton label="UPDATE" onPress={(() => {
+                this.props.updateProfile(this.state, user.profile.token).then(() => {
+                  alert("Profile Successfully Updated");
+                });
+
+              })} />
             </View>
           </Card>
         </ScrollView>
@@ -98,9 +94,9 @@ class UserPage extends Component {
 }
 
 const mapStatetoProps = ({ userState, auth }) => {
-  const { user } = userState;
+  const { user, hasProfileUpdated } = userState;
   const { token } = auth;
-  return { token, user }
+  return { token, user, hasProfileUpdated }
 }
 
-export default connect(mapStatetoProps, { fetchProfile })(UserPage);
+export default connect(mapStatetoProps, { fetchProfile, updateProfile })(UserPage);
