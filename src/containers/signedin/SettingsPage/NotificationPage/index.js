@@ -27,14 +27,15 @@ class NotificationPage extends Component {
   };
 
   componentDidMount() {
-    const { token } = this.props;
-    this.props.fetchNotificationSettings(token)
+    const { user } = this.props;
+    this.props.fetchNotificationSettings(user.profile.token)
       .then(() => { this.loadInitialData(); }
       );
   }
 
   loadInitialData() {
     const { notification } = this.props;
+    console.log(notification)
     const options = [...this.state.notifItems];
     options[0].toggleStatus = notification.notificationPush;
     options[1].toggleStatus = notification.notificationSms;
@@ -43,7 +44,7 @@ class NotificationPage extends Component {
   }
 
   toggle(i) {
-    const { notification, token } = this.props;
+    const { notification, user } = this.props;
     const options = [...this.state.notifItems];
 
     this.setState({ options });
@@ -54,7 +55,7 @@ class NotificationPage extends Component {
         { options }, () => {
           const options = [...this.state.notifItems];
           const data = { "notificationPush": this.state.notifItems[0].toggleStatus };
-          this.props.updateNotificationSettings(data, token, "push");
+          this.props.updateNotificationSettings(data, user.profile.token, "push");
         }
       );
     } else if (i === 1) {
@@ -63,7 +64,7 @@ class NotificationPage extends Component {
         { options }, () => {
           const options = [...this.state.notifItems];
           const data = { "notificationSms": this.state.notifItems[1].toggleStatus };
-          this.props.updateNotificationSettings(data, token, "sms");
+          this.props.updateNotificationSettings(data, user.profile.token, "sms");
         }
       );
     } else if (i === 2) {
@@ -72,7 +73,7 @@ class NotificationPage extends Component {
         { options }, () => {
           const options = [...this.state.notifItems];
           const data = { "notificationEmail": this.state.notifItems[2].toggleStatus };
-          this.props.updateNotificationSettings(data, token, "email");
+          this.props.updateNotificationSettings(data, user.profile.token, "email");
         }
       );
     }
@@ -140,12 +141,13 @@ class NotificationPage extends Component {
   }
 }
 
-const mapStatetoProps = ({ settings, auth }) => {
-  const { notification } = settings;
-  const { token } = auth;
 
-  return { notification, token };
-};
+const mapStatetoProps = ({ userState, auth, settingsState }) => {
+  const { user, hasProfileUpdated } = userState;
+  const { token } = auth;
+  const { notification } = settingsState;
+  return { token, user, hasProfileUpdated, notification }
+}
 
 export default connect(
   mapStatetoProps,

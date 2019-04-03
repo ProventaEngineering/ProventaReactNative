@@ -34,6 +34,7 @@ export const failedFetchProfileAndMeeting = (e) => async dispatch => {
   dispatch({ type: FETCH_PROFILE_FAILED, payload: { message: e.toString() }, error: true });
   dispatch({ type: FETCH_MEETINGS_FAILED, payload: { message: e.toString() }, error: true })
 }
+
 export const fetchProfile = (token) => async dispatch => {
 
   dispatch({ type: FETCH_PROFILE_REQUEST });

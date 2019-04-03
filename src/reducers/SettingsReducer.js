@@ -8,13 +8,7 @@ import {
 
 const INITIAL_STATE = {
   calendar: {},
-  notification: {},
-  syncGoogle: "",
-  syncCalendar: "",
-  push: "",
-  sms: "",
-  email: "",
-  message: ""
+  notification: {}
 };
 
 export default function (state = INITIAL_STATE, action) {
@@ -44,6 +38,8 @@ export default function (state = INITIAL_STATE, action) {
         calendar: {
           calendarGoogle: action.payload.type === 'google' ? action.payload.result.calendarGoogle : null,
           calendarIcalendar: action.payload.type === 'calendar' ? action.payload.result.calendarIcalendar : null,
+        },
+        notification: {
           notificationPush: action.payload.type === 'push' ? action.payload.result.notificationPush : null,
           notificationSms: action.payload.type === 'sms' ? action.payload.result.notificationSms : null,
           notificationsEmail: action.payload.type === 'email' ? action.payload.result.notificationsEmail : null
