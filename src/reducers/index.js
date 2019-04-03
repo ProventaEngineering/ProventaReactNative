@@ -9,6 +9,6 @@ export default combineReducers({
   auth: AuthReducer,
   userState: UserReducer,
   meetingsState: MeetingReducer,
-  settings: SettingsReducer,
+  settingsState: SettingsReducer,
   history: HistoryReducer
 });

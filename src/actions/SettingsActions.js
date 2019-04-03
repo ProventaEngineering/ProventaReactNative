@@ -9,69 +9,63 @@ import {
 
 import axios from "axios";
 
-//Update syncGoogle and syncCalendar field
-//Update push, sms, or email
-// export const updateSettings = ({ prop, value }) => {
-//   return {
-//     type: SETTINGS_UPDATE,
-//     payload: { prop, value }
-//   };
-// };
-
 //Retrieve calendar settings
-export const fetchCalendarSettings = (token, callback) => async dispatch => {
+export const fetchCalendarSettings = (token) => async dispatch => {
+  const url = `${SERVER_ADDRESS}/settings`;
   try {
-    const request = await axios.get(
-      `${SERVER_ADDRESS}/settings/`,
-      { "headers": { "Content-Type": "application/json", "Authorization": token } }
-    );
+    const request = await axios.get(url, {
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": token
+      }
+    });
+    const settings = await request.data;
     dispatch({
       type: FETCH_CALENDAR_SETTINGS,
-      payload: request.data.attributes
+      payload: { ...settings.data.attributes }
     });
-    callback();
   } catch (error) {
     console.log(error);
+    dispatch({ type: SETTINGS_CONFIG_FAIL, payload: { message: e.toString() }, error: true });
   }
 };
 
 
-
 //Update calendar settings
-export const updateCalendarSettings = (data, token, type) => async dispatch => {
+export const updateCalendarSettings = (data, token) => async dispatch => {
   try {
     const request = await axios.patch(
       `${SERVER_ADDRESS}/settings`,
       data,
       { "headers": { "Content-Type": "application/json", "Authorization": token } }
     );
+    const settings = await request.data;
     dispatch({
       type: SETTINGS_CONFIG_SUCCESS,
-      payload: {
-        type,
-        result: request.data.data.attributes
-      }
+      payload: { ...settings.data.attributes }
     });
 
   } catch (error) {
     console.log(error);
+    dispatch({ type: SETTINGS_CONFIG_FAIL, payload: { message: e.toString() }, error: true });
   }
 };
 
 //Retrieve notification settings
-export const fetchNotificationSettings = (token, callback) => async dispatch => {
+export const fetchNotificationSettings = (token) => async dispatch => {
   try {
     const request = await axios.get(
-      `${SERVER_ADDRESS}/settings/`,
+      `${SERVER_ADDRESS}/settings`,
       { "headers": { "Content-Type": "application/json", "Authorization": token } }
     );
+    const settings = await request.data;
     dispatch({
       type: FETCH_NOTIFICATION_SETTINGS,
-      payload: request.data.data.attributes
+      payload: { ...settings.data.attributes }
     });
-    callback()
   } catch (error) {
     console.log(error);
+    dispatch({ type: SETTINGS_CONFIG_FAIL, payload: { message: e.toString() }, error: true });
   }
 };
 
@@ -79,18 +73,18 @@ export const fetchNotificationSettings = (token, callback) => async dispatch => 
 export const updateNotificationSettings = (data, token, type) => async dispatch => {
   try {
     const request = await axios.patch(
-      `${SERVER_ADDRESS}/settings/`,
+      `${SERVER_ADDRESS}/settings`,
       data,
       { "headers": { "Content-Type": "application/json", "Authorization": token } }
     );
+    const settings = await request.data;
     dispatch({
       type: SETTINGS_CONFIG_SUCCESS,
-      payload: {
-        type,
-        result: request.data.data.attributes
-      }
-    })
+      payload: { ...settings.data.attributes, type }
+    });
+
   } catch (error) {
     console.log(error);
+    dispatch({ type: SETTINGS_CONFIG_FAIL, payload: { message: e.toString() }, error: true });
   }
 }

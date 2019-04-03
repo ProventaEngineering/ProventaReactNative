@@ -98,8 +98,8 @@ class CalendarPage extends Component {
   }
 
   componentDidMount() {
-    const { token } = this.props;
-    this.props.fetchCalendarSettings(token).then(() => {
+    const { user } = this.props;
+    this.props.fetchCalendarSettings(user.profile.token).then(() => {
       this.loadInitialData();
     });
   }
@@ -107,6 +107,7 @@ class CalendarPage extends Component {
 
   loadInitialData() {
     const { calendar } = this.props;
+    console.log("dsdsd", calendar);
 
     const options = [...this.state.calendarItems];
     options[0].toggleStatus = calendar.calendarGoogle;
@@ -210,11 +211,12 @@ class CalendarPage extends Component {
   }
 }
 
-const mapStatetoProps = ({ settings, auth }) => {
-  const { calendar } = settings;
+const mapStatetoProps = ({ userState, auth, settingsState }) => {
+  const { user, hasProfileUpdated } = userState;
   const { token } = auth;
-  return { calendar, token };
-};
+  const { calendar } = settingsState;
+  return { token, user, hasProfileUpdated, calendar }
+}
 
 export default connect(
   mapStatetoProps,
