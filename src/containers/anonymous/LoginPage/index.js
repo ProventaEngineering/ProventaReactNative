@@ -131,7 +131,7 @@ class LoginPage extends Component {
       email: emailAddress.value,
       password: password.value
     };
-    this.setState({ isFetching: true })
+    this.setState({ isFetching: true, authError: '' })
     this.props.login(data).then(() => {
       if (this.props.token) {
         this.storeToken(this.props.token);
