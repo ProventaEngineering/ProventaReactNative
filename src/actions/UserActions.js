@@ -35,26 +35,26 @@ export const failedFetchProfileAndMeeting = (e) => async dispatch => {
   dispatch({ type: FETCH_MEETINGS_FAILED, payload: { message: e.toString() }, error: true })
 }
 
-export const fetchProfile = (token) => async dispatch => {
+export const fetchProfile = (token, callback) => async dispatch => {
 
-  dispatch({ type: FETCH_PROFILE_REQUEST });
-  const url = `${SERVER_ADDRESS}/profile`;
   try {
-    const request = await axios.get(url, {
+    const request = await axios.get(`${SERVER_ADDRESS}/profile`, {
       "headers": {
         "Content-Type": "application/json",
         "Authorization": token
       }
     });
-    const profile = await request.data;
+    //Login Success
     dispatch({
       type: FETCH_PROFILE_RESPONSE,
-      payload: { ...profile.data.attributes, ...{ "token": token } }
+      payload: { ...request.data.data.attributes, ...{ "token": token } }
     });
+    callback();
   } catch (error) {
     console.log(error);
-    dispatch({ type: FETCH_PROFILE_FAILED, payload: { message: e.toString() }, error: true });
+    dispatch({ type: FETCH_PROFILE_FAILED, payload: { message: error.toString() }, error: true });
   }
+
 };
 
 
@@ -90,7 +90,7 @@ export const updateProfile = (payload, token) => async dispatch => {
 //     });
 //     dispatch({
 //       type: FETCH_PROFILE,
-//       payload: request.data.data
+//       payload: request.data.data.attributes
 //     });
 //     // callback();
 //   } catch (error) {

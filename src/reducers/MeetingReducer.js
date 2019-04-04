@@ -14,6 +14,7 @@ const INITIAL_STATE = {
   meetings: {
     hasMeetingsLoaded: false, //will have an
     ids: [],
+    items: []
     //ids as index
   },
 };
@@ -26,7 +27,7 @@ export default function (state = INITIAL_STATE, action) {
       console.log(">>>>>>>>>>>>>>>>>>>>>FETCH_MEETINGS_REQUEST");
       return {
         ...state,
-        meetings: {items: [], hasMeetingsLoaded: false},
+        meetings: { items: [], hasMeetingsLoaded: false },
       };
     case FETCH_MEETINGS_RESPONSE:
       console.log(">>>>>>>>>>>>>>>>>>>>>FETCH_MEETINGS_RESPONSE");
@@ -34,13 +35,14 @@ export default function (state = INITIAL_STATE, action) {
         ...state,
         meetings: {
           ids: action.payload.map(({ id }) => id),
-          items: Object.assign({}, ...action.payload.map(item => ({ [item.id]: item.attributes }) ) ),
-          hasMeetingsLoaded: true},
+          items: Object.assign({}, ...action.payload.map(item => ({ [item.id]: item.attributes }))),
+          hasMeetingsLoaded: true
+        },
       };
     case FETCH_MEETINGS_FAILED:
       return {
         ...state,
-        meetings: {items: [], hasMeetingsLoaded: false},
+        meetings: { items: [], hasMeetingsLoaded: false },
       };
     case FETCH_MEETING_REQUEST:
       return {
