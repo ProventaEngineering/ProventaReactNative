@@ -9,8 +9,7 @@ import {
 } from "./types";
 
 import axios from "axios";
-import {failedFetchProfileAndMeeting, fetchProfileAndMeetings} from "./UserActions";
-import AsyncStorage from "react-native";
+import { fetchProfileAndMeetings } from "./UserActions";
 
 // Update emailAddress and password field
 export const updateAuth = ({ prop, value }) => {
@@ -66,11 +65,13 @@ export const signUp = data => async dispatch => {
   }
 };
 export const loginAndFetchData = (data) => async dispatch => {
-  dispatch(login(data)).then( token => dispatch(fetchProfileAndMeetings(token)));
+  dispatch(login(data)).then(token =>
+    dispatch(fetchProfileAndMeetings(token))
+  );
 }
 
 
-export const login = (data) => async dispatch => {
+export const login = (data, callback) => async dispatch => {
   try {
     const request = await axios.post(`${SERVER_ADDRESS}/auth/login`, {
       email: data.email,
@@ -88,10 +89,10 @@ export const login = (data) => async dispatch => {
         payload: "Login Failed"
       });
     }
-    return request.data.auth_token;
     //This is called after the POST function is done
     // For UI trigger
-    // callback();
+    callback();
+    // return request.data.auth_token;
   } catch (error) {
     error;
   }

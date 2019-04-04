@@ -28,9 +28,7 @@ axios.defaults.headers.post['Access-Control-Allow-Methods'] = 'PATCH, DELETE, PO
 
 //Retrieve meetings
 export const fetchMeetings = (token) => async dispatch => {
-  dispatch({type: FETCH_MEETINGS_REQUEST});
-
-
+  dispatch({ type: FETCH_MEETINGS_REQUEST });
   //get token then fetch meetings
   try {
     const url =
@@ -45,10 +43,11 @@ export const fetchMeetings = (token) => async dispatch => {
         }
       }
     );
-    const meetings = await request.data;
+    const meetings = request.data;
     dispatch({ type: FETCH_MEETINGS_RESPONSE, payload: meetings.data });
-  }catch (e) {
-    dispatch({ type: FETCH_MEETINGS_FAILED, payload: {message: e.toString()}, error: true });
+    // callback();
+  } catch (e) {
+    dispatch({ type: FETCH_MEETINGS_FAILED, payload: { message: e.toString() }, error: true });
   }
 };
 
