@@ -10,7 +10,7 @@ export default (ComponentStyle = {
     width: SCREEN_WIDTH,
     padding: 10,
     marginTop:
-      Platform.OS === "ios" ? SCREEN_HEIGHT * 0.03 : SCREEN_HEIGHT * 0.003,
+      Platform.OS === "ios" ? SCREEN_HEIGHT * 0.03 : SCREEN_HEIGHT * 0.03,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

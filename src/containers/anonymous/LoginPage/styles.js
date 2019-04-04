@@ -63,5 +63,13 @@ export default (PageStyle = {
     // paddingLeft: SCREEN_WIDTH * 0.03,
     // paddingRight: SCREEN_WIDTH * 0.03,
     backgroundColor: "#ffffff"
+  },
+  errorContainer: {
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 15,
+    fontWeight: "400",
+    color: BLUE
   }
 });

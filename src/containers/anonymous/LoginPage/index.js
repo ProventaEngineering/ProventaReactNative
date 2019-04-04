@@ -5,7 +5,8 @@ import {
   Image,
   Text,
   TouchableOpacity,
-  AsyncStorage
+  AsyncStorage,
+  ActivityIndicator
 } from "react-native";
 import {
   Header,
@@ -18,10 +19,15 @@ import {
 import PageStyle from "./styles";
 import { DrawerActions } from "react-navigation";
 import { connect } from "react-redux";
-import { login, updateAuth, loginAndFetchData } from "../../../actions";
+import { updateAuth, login, fetchProfile, fetchMeetings } from "../../../actions";
 // import { GoogleSignin, statusCodes } from "react-native-google-signin";
 
 class LoginPage extends Component {
+
+  state = {
+    isFetching: null,
+    authError: '',
+  }
   componentDidMount() {
     // GoogleSignin.configure({
     //   iosClientId:
@@ -30,6 +36,7 @@ class LoginPage extends Component {
     //     "631979342854-v68oaojlkgttth4j9bqp103ea1po8egb.apps.googleusercontent.com" //only for android
     // });
     // this.getCurrentUser();
+
   }
 
   getCurrentUser = async () => {
@@ -99,7 +106,6 @@ class LoginPage extends Component {
           onChangeText={value => {
             this.props.updateAuth({ prop: "emailAddress", value });
           }}
-          icon={require("../../../assets/login_user.png")}
         />
         <StyledInput
           type="password"
@@ -107,8 +113,6 @@ class LoginPage extends Component {
           onChangeText={value => {
             this.props.updateAuth({ prop: "password", value });
           }}
-          icon={require("../../../assets/login_password.png")}
-          visibilityIcon={require("../../../assets/login_eye.png")}
         />
       </View>
     );
@@ -122,23 +126,33 @@ class LoginPage extends Component {
   }
 
   loginUser() {
-    const { emailAddress, password, status, navigation, token, user, meetings } = this.props;
+    const { emailAddress, password } = this.props;
     const data = {
-      email: this.props.emailAddress.value,
-      password: this.props.password.value
+      email: emailAddress.value,
+      password: password.value
     };
-    this.props.loginAndFetchData(data);
-    if (status === 'loggedin' && user.hasProfileLoaded && meetings.hasMeetingsLoaded) {
-      this.storeToken(token);
-      const meetingId = user.profile.meetingIds.count > 0 ? user.profile.meetingIds[0] : meetings.ids[0];
-      navigation.navigate("MeetingLoginPage", {status: "loggedin", meetingId: meetingId});
-
-
-    }
+    this.setState({ isFetching: true })
+    this.props.login(data).then(() => {
+      if (this.props.token) {
+        this.storeToken(this.props.token);
+        this.props.fetchProfile(this.props.token).then(() => {
+          this.props.fetchMeetings(this.props.token).then(() => {
+            const { status, navigation, user, meetings } = this.props;
+            if (status === 'loggedin' && user.hasProfileLoaded && meetings.hasMeetingsLoaded) {
+              this.setState({ isFetching: false })
+              const meetingId = user.profile.meetingIds.count > 0 ? user.profile.meetingIds[0] : meetings.ids[0];
+              navigation.navigate("MeetingLoginPage", { status: "loggedin", meetingId: meetingId });
+            }
+          })
+        })
+      } else {
+        this.setState({ isFetching: false, authError: 'Invalid Credentials' })
+      }
+    });
   }
 
   render() {
-    const { navigation, status, message, emailAddress, password } = this.props;
+    const { navigation, meetings, status, user, token } = this.props;
     return (
       <View style={PageStyle.container}>
         <Header
@@ -148,20 +162,36 @@ class LoginPage extends Component {
           }}
         />
         <ScrollView>
-          <View style={PageStyle.card}>
-            {this.renderLoginForm()}
-            <MainButton
-              onPress={() => {
-                this.loginUser();
-              }}
-              label="LOGIN"
-            />
-            <View style={PageStyle.sectionLine} />
-            {this.renderSocialLinks()}
-            <Text style={PageStyle.signUpLabel}>Don't have an account?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("SignUpPage")}>
-              <Text style={PageStyle.signUpLink}> Sign up now </Text>
-            </TouchableOpacity>
+          <View style={ComponentStyle.container}>
+            {
+              (this.state.isFetching === null || this.state.isFetching === false) &&
+              <View style={PageStyle.card}>
+                {this.renderLoginForm()}
+                <MainButton
+                  onPress={() => {
+                    this.loginUser();
+                  }}
+                  label="LOGIN"
+                />
+                <View style={PageStyle.errorContainer}>
+                  <Text style={PageStyle.errorText}> {this.state.authError} </Text>
+                </View>
+
+                <View style={PageStyle.sectionLine} />
+                {this.renderSocialLinks()}
+                <Text style={PageStyle.signUpLabel}>Don't have an account?</Text>
+                <TouchableOpacity onPress={() => navigation.navigate("SignUpPage")}>
+                  <Text style={PageStyle.signUpLink}> Sign up now </Text>
+                </TouchableOpacity>
+              </View>
+
+            }
+            {
+              this.state.isFetching &&
+              <View style={PageStyle.loading}>
+                <ActivityIndicator loaded={meetings.hasMeetingsLoaded} size="large" />
+              </View>
+            }
           </View>
         </ScrollView>
         <TabbedMenu navigation={navigation} />
@@ -179,5 +209,5 @@ const mapStateToProps = ({ auth, userState, meetingsState }) => {
 
 export default connect(
   mapStateToProps,
-  { login, updateAuth, loginAndFetchData }
+  { login, updateAuth, fetchProfile, fetchMeetings }
 )(LoginPage);
