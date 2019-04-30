@@ -7,7 +7,6 @@ export default (PageStyle = {
   container: {
     flex: 1
   },
-
   listContainer: {
     width: "95%",
     backgroundColor: "#ffffff",
@@ -58,6 +57,15 @@ export default (PageStyle = {
     alignSelf: "center",
     opacity: 0.3
   },
+  agendaContainer: {
+    marginBottom: SCREEN_HEIGHT * 0.15,
+  },
+  agendaDetails: {
+    fontSize: 14,
+    color: DARK_GRAY,
+    paddingLeft: SCREEN_WIDTH * 0.02,
+    marginTop: SCREEN_HEIGHT * 0.01,
+  },
   boxContainer: {
     width: "95%",
     backgroundColor: "#ffffff",
@@ -83,6 +91,11 @@ export default (PageStyle = {
     height: SCREEN_HEIGHT * 0.6,
     resizeMode: "contain"
   },
+  agendaImage: {
+    width: SCREEN_WIDTH * 0.90,
+    height: SCREEN_HEIGHT * 0.2,
+    resizeMode: "contain"
+  },
   loading: {
     position: 'absolute',
     left: 0,
@@ -92,4 +105,7 @@ export default (PageStyle = {
     alignItems: 'center',
     justifyContent: 'center'
   },
+  timeContainer: {
+    paddingBottom: SCREEN_HEIGHT * 0.03
+  }
 });
