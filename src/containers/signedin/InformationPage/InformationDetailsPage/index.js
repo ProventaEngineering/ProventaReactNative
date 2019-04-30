@@ -19,7 +19,6 @@ class InformationDetailsPage extends Component {
         <View key={id} style={PageStyle.listContainer}>
           <ListItem
             onPress={() => {
-              ("schedl");
               this.setState(
                 {
                   selectedIndex: index
@@ -56,7 +55,6 @@ class InformationDetailsPage extends Component {
     const { navigation, meetings } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    // const participants = navigation.getParam("participants");
     const participant = meeting.participants.map(({ id, first_name, last_name, position, company, linkedin }, index, participants) => {
       return (
         <View key={id} style={PageStyle.listContainer}>
@@ -108,12 +106,40 @@ class InformationDetailsPage extends Component {
   }
 
   renderPersonalSchedule() {
-    return (
-      <View style={{ width: "45%", alignItems: "center" }}>
-        <Text> Upcoming Feature</Text>
-      </View>
-    );
+    const { navigation, meetings } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    const meeting = meetings.items[meetingId];
+
+    const session = meeting.personalizeAgenda.schedules.map(({ subject, time }) => {
+      return (
+        <Card>
+          <View style={PageStyle.listContainer}>
+            <ListItem>
+              <Text style={PageStyle.listTitle}> {subject.title} </Text>
+              {
+                subject.facilitator !== null ?
+                  <Text style={PageStyle.agendaDetails}> {subject.facilitator.full_name} - {subject.facilitator.company}  </Text> : null
+              }
+              {
+                subject.floor_plan !== null ?
+                  <View>
+                    <Image style={PageStyle.agendaImage} source={{ uri: subject.floor_plan.image.url }} />
+                    <Text style={PageStyle.agendaDetails}> {subject.floor_plan.location} </Text>
+                  </View>
+                  : null
+              }
+              <View style={PageStyle.timeContainer}>
+                <Text style={PageStyle.listTitle}> {time} </Text>
+              </View>
+            </ListItem>
+          </View>
+        </Card >
+      )
+    });
+
+    return session;
   }
+
 
   renderContent() {
     const { navigation } = this.props;
@@ -133,7 +159,14 @@ class InformationDetailsPage extends Component {
         </ScrollView>
       );
     } else if (content === "PERSONAL SCHEDULE") {
-      return <Card>{this.renderPersonalSchedule()}</Card>;
+      return (
+        <ScrollView>
+          <View style={PageStyle.agendaContainer}>
+            {this.renderPersonalSchedule()}
+          </View>
+        </ScrollView>
+      )
+
     }
   }
 
@@ -143,7 +176,7 @@ class InformationDetailsPage extends Component {
     const content = navigation.getParam("content");
     const route = navigation.getParam("previousRoute");
     const meetingId = navigation.getParam("meetingId");
-    if(meetings.hasMeetingsLoaded) {
+    if (meetings.hasMeetingsLoaded) {
       return (
         <View style={PageStyle.container}>
           <Header
@@ -170,10 +203,10 @@ class InformationDetailsPage extends Component {
             }}
           />
           {this.renderContent()}
-          <TabbedMenu navigation={navigation} status="loggedin"/>
+          <TabbedMenu navigation={navigation} status="loggedin" />
         </View>
       );
-    }else{
+    } else {
       return (
         <View style={ComponentStyle.container}>
           <View style={PageStyle.loading}>
