@@ -72,7 +72,7 @@ class MeetingPage extends Component {
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
     if (meeting.venue != undefined) {
-      return <Text key={meeting.venue.id}> {meeting.venue.title} </Text>;
+      return <Text key={'venue' + meeting.venue.id}> {meeting.venue.title} </Text>;
     } else {
       return <Text > TBA </Text>;
     }
@@ -84,7 +84,7 @@ class MeetingPage extends Component {
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
     if (meeting != undefined) {
-      return <Image key={meeting.venue.id} style={PageStyle.image} source={meeting.venue.image} />;
+      return <Image key={'picture' + meeting.venue.id} style={PageStyle.image} source={{ uri: meeting.image.url }} />;
     }
 
   }
@@ -125,7 +125,7 @@ class MeetingPage extends Component {
       const expectation = meeting.expectations.map(
         ({ id, image, title, description }) => {
           return (
-            <View key={id} style={PageStyle.expectationContainer}>
+            <View key={'expectations' + id} style={PageStyle.expectationContainer}>
               <View style={PageStyle.expectationList}>
                 <View style={{ width: "25%" }}>
                   <Image
@@ -154,15 +154,25 @@ class MeetingPage extends Component {
     this.setState({ modalVisible: true });
   }
 
+  removeDuplicatesBy(keyFn, array) {
+    var mySet = new Set();
+    return array.filter(function (x) {
+      var key = keyFn(x), isNew = !mySet.has(key);
+      if (isNew) mySet.add(key);
+      return isNew;
+    });
+  }
+
   renderFacilitators() {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
     if (meeting != undefined) {
-      const facilitator = meeting.facilitators.map(
+      const facilitatorCopy = this.removeDuplicatesBy(x => x.id, meeting.facilitators);
+      const facilitator = facilitatorCopy.map(
         ({ id, first_name, last_name, position }, index, facilitators) => {
           return (
-            <View key={id} style={PageStyle.expectationContainer}>
+            <View key={'facilitators' + id} style={PageStyle.expectationContainer}>
               <ListItem
                 onPress={() => {
                   this.setState(
@@ -214,7 +224,7 @@ class MeetingPage extends Component {
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
     if (meeting != undefined) {
-      return <Map key={meeting.venue.id} latitude={meeting.venue.latitude} longitude={meeting.venue.longitude}
+      return <Map key={'map' + meeting.venue.id} latitude={meeting.venue.latitude} longitude={meeting.venue.longitude}
         title={meeting.venue.title} />;
     }
   }
@@ -237,7 +247,7 @@ class MeetingPage extends Component {
   }
 
   render() {
-    const { navigation, meetings, user } = this.props;
+    const { navigation, meetings } = this.props;
     const status = navigation.getParam("status") != undefined ? navigation.getParam("status") : "loggedout";
     const meetingId = navigation.getParam("meetingId");
     return (
