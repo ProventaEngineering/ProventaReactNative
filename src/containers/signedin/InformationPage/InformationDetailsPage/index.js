@@ -10,11 +10,21 @@ import ComponentStyle from "../../../../components/TabbedMenu/styles";
 class InformationDetailsPage extends Component {
 
 
+  removeDuplicatesBy(keyFn, array) {
+    var mySet = new Set();
+    return array.filter(function (x) {
+      var key = keyFn(x), isNew = !mySet.has(key);
+      if (isNew) mySet.add(key);
+      return isNew;
+    });
+  }
+
   renderFacilitators() {
     const { navigation, meetings } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    const facilitator = meeting.facilitators.map(({ id, first_name, last_name, company, position }, index, facilitators) => {
+    const facilitatorCopy = this.removeDuplicatesBy(x => x.id, meeting.facilitators);
+    const facilitator = facilitatorCopy.map(({ id, first_name, last_name, company, position }, index, facilitators) => {
       return (
         <View key={id} style={PageStyle.listContainer}>
           <ListItem
