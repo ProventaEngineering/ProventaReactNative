@@ -6,7 +6,7 @@ import {
   Text,
   TouchableOpacity,
   AsyncStorage,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import {
   Header,
@@ -14,25 +14,25 @@ import {
   Card,
   StyledInput,
   MainButton,
-  SocialButton
+  SocialButton,
 } from "../../../components";
 import PageStyle from "./styles";
 import { DrawerActions } from "react-navigation";
 import { connect } from "react-redux";
 import { updateAuth, login, fetchProfile, fetchMeetings } from "../../../actions";
-import { Google } from 'expo';
+import { Google, AuthSession } from "expo";
+import * as API from "../../../services";
 // import Expo from 'expo';
-
-
+const LINKEDIN_CLIENT_ID = "81opzafzg88o93";
 class LoginPage extends Component {
-
   state = {
     isFetching: null,
-    authError: '',
-    user: null
-  }
+    authError: "",
+    user: null,
+  };
   async componentDidMount() {
-
+    console.log({ Google });
+    // this.syncUserWithStateAsync();
   }
 
   syncUserWithStateAsync = async () => {
@@ -41,31 +41,61 @@ class LoginPage extends Component {
   };
 
   loginWithGoogle = async () => {
-
     try {
+      console.log("start logging in");
       const result = await Google.logInAsync({
-        iosClientId: "6966997513-s5mroeevftu0i8l0a8rmm35c5cv9v12p.apps.googleusercontent.com",
+        clientId: "6966997513-s5mroeevftu0i8l0a8rmm35c5cv9v12p.apps.googleusercontent.com",
+        // iosClientId: "6966997513-s5mroeevftu0i8l0a8rmm35c5cv9v12p.apps.googleusercontent.com",
         // iosStandaloneAppClientId: `6966997513-bhctt6ajg1b5l2gakrgq7527vs0ikvgm.apps.googleusercontent.com`,
-        scopes: ['profile', 'email'],
-        behavior: 'web'
+        // androidClientId: "6966997513-s5mroeevftu0i8l0a8rmm35c5cv9v12p.apps.googleusercontent.com",
+        // scopes: ["profile", "email"],
+        // behavior: "web",
       });
 
       console.log(result);
-      alert(JSON.stringify(result.user))
+      alert(JSON.stringify(result.user));
 
-      if (result.type === 'success') {
+      if (result.type === "success") {
         return result.accessToken;
       } else {
         return { cancelled: true };
       }
     } catch (e) {
+      console.log(e);
       return { error: true };
     }
-  }
+  };
 
   cacheAuthAsync(authState) {
     return AsyncStorage.setItem(StorageKey, JSON.stringify(authState));
   }
+
+  loginWithLinkedIn = async () => {
+    try {
+      const redirectUrl = AuthSession.getRedirectUrl();
+      console.log({ redirectUrl });
+      const result = await AuthSession.startAsync({
+        authUrl:
+          `https://www.linkedin.com/oauth/v2/authorization?response_type=code` +
+          `&client_id=${LINKEDIN_CLIENT_ID}` +
+          `&redirect_uri=${encodeURIComponent(redirectUrl)}` +
+          `&scope=r_basicprofile%20r_emailaddress%20w_member_social`,
+      });
+      const {
+        params: { code },
+      } = result;
+      const authResult = await API.authLinkedIn({
+        code,
+        client_id: LINKEDIN_CLIENT_ID,
+        redirect_uri: redirectUrl,
+      });
+      const { access_token } = authResult.data;
+      const linkedInProfile = await API.getLinkedInProfile(access_token);
+      console.log("linkedInProfile", linkedInProfile);
+    } catch (error) {
+      console.log("loginWithLinkedIn error", error);
+    }
+  };
 
   renderSocialLinks() {
     return (
@@ -75,9 +105,7 @@ class LoginPage extends Component {
           label="Log in with LinkedIn"
           icon={require("../../../assets/linkedin_button.png")}
           // onPress={this.signIn.bind(this)}
-          onPress={() => {
-            console.log("hello");
-          }}
+          onPress={this.loginWithLinkedIn}
         />
         <SocialButton
           type="google"
@@ -112,39 +140,38 @@ class LoginPage extends Component {
     );
   }
 
-  storeToken = async (token) => {
+  storeToken = async token => {
     try {
-      await AsyncStorage.setItem('token', token);
-    } catch (error) {
-    }
-  }
+      await AsyncStorage.setItem("token", token);
+    } catch (error) {}
+  };
 
   loginUser() {
     const { emailAddress, password } = this.props;
     const data = {
       email: emailAddress.value,
-      password: password.value
+      password: password.value,
     };
-    this.setState({ isFetching: true, authError: '' })
+    this.setState({ isFetching: true, authError: "" });
     this.props.login(data).then(() => {
       if (this.props.token) {
         this.storeToken(this.props.token);
         this.props.fetchProfile(this.props.token).then(() => {
           this.props.fetchMeetings(this.props.token).then(() => {
             const { status, navigation, user, meetings } = this.props;
-            if (status === 'loggedin' && user.hasProfileLoaded && meetings.hasMeetingsLoaded) {
-              this.setState({ isFetching: false })
-              const meetingId = user.profile.meetingIds.count > 0 ? user.profile.meetingIds[0] : meetings.ids[0];
+            if (status === "loggedin" && user.hasProfileLoaded && meetings.hasMeetingsLoaded) {
+              this.setState({ isFetching: false });
+              const meetingId =
+                user.profile.meetingIds.count > 0 ? user.profile.meetingIds[0] : meetings.ids[0];
               navigation.navigate("MeetingLoginPage", { status: "loggedin", meetingId: meetingId });
             }
-          })
-        })
+          });
+        });
       } else {
-        this.setState({ isFetching: false, authError: 'Invalid Credentials' })
+        this.setState({ isFetching: false, authError: "Invalid Credentials" });
       }
     });
   }
-
 
   render() {
     const { navigation, meetings, status, user, token } = this.props;
@@ -158,8 +185,7 @@ class LoginPage extends Component {
         />
         <ScrollView>
           <View style={ComponentStyle.container}>
-            {
-              (this.state.isFetching === null || this.state.isFetching === false) &&
+            {(this.state.isFetching === null || this.state.isFetching === false) && (
               <View style={PageStyle.card}>
                 {this.renderLoginForm()}
                 <MainButton
@@ -179,14 +205,12 @@ class LoginPage extends Component {
                   <Text style={PageStyle.signUpLink}> Sign up now </Text>
                 </TouchableOpacity>
               </View>
-
-            }
-            {
-              this.state.isFetching &&
+            )}
+            {this.state.isFetching && (
               <View style={PageStyle.loading}>
                 <ActivityIndicator loaded={meetings.hasMeetingsLoaded} size="large" />
               </View>
-            }
+            )}
           </View>
         </ScrollView>
         <TabbedMenu navigation={navigation} />
@@ -204,6 +228,5 @@ const mapStateToProps = ({ auth, userState, meetingsState }) => {
 
 export default connect(
   mapStateToProps,
-  { login, updateAuth, fetchProfile, fetchMeetings }
+  { login, updateAuth, fetchProfile, fetchMeetings },
 )(LoginPage);
-

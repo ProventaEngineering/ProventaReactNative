@@ -1,26 +1,17 @@
 import React, { Component } from "react";
-import {
-  Text,
-  View,
-  ScrollView,
-  Image,
-  ActivityIndicator,
-  AsyncStorage
-} from "react-native";
+import { Text, View, ScrollView, Image, ActivityIndicator, AsyncStorage } from "react-native";
 import { connect } from "react-redux";
 import { Header, TabbedMenu, Card, ListItem } from "../../../components";
 import PageStyle from "./styles";
 import { DrawerActions } from "react-navigation";
-import {fetchProfile, fetchMeetings, fetchProfileAndMeetings} from "../../../actions";
-import { Permissions, Notifications } from 'expo';
-
+import { fetchProfile, fetchMeetings, fetchProfileAndMeetings } from "../../../actions";
+import { Permissions, Notifications } from "expo";
 
 class HomePage extends Component {
   state = {
     notification: {},
-    status: "loggedout"
+    status: "loggedout",
   };
-
 
   async componentWillMount() {
     try {
@@ -28,15 +19,11 @@ class HomePage extends Component {
       this.notificationSubscription = Notifications.addListener(this.handleNotification);
 
       const token = await AsyncStorage.getItem("token");
-      if(token == null || token == undefined ){
-        this.setState({status: "loggedout"},()=>{
+      if (token == null || token == undefined) {
+        this.setState({ status: "loggedout" }, () => {
           this.props.fetchMeetings();
-        })
-
+        });
       }
-
-
-
     } catch (error) {
       // Error retrieving data
     }
@@ -67,8 +54,7 @@ class HomePage extends Component {
   //   }
   // }
 
-
-  handleNotification = (notification) => {
+  handleNotification = notification => {
     this.setState({ notification: notification });
   };
   // renderCategories() {
@@ -87,35 +73,36 @@ class HomePage extends Component {
   // }
 
   async registerForPushNotificationsAsync() {
-    const { status: existingStatus } = await Permissions.getAsync(
-      Permissions.NOTIFICATIONS
-    );
+    try {
+      const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
 
-    let finalStatus = existingStatus;
+      let finalStatus = existingStatus;
 
-    // only ask if permissions have not already been determined, because
-    // iOS won't necessarily prompt the user a second time.
-    if (existingStatus !== 'granted') {
-      // Android remote notification permissions are granted during the app
-      // install, so this will only ask on iOS
-      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-      finalStatus = status;
+      // only ask if permissions have not already been determined, because
+      // iOS won't necessarily prompt the user a second time.
+      if (existingStatus !== "granted") {
+        // Android remote notification permissions are granted during the app
+        // install, so this will only ask on iOS
+        const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+        finalStatus = status;
+      }
+
+      // Stop here if the user did not grant permissions
+      if (finalStatus !== "granted") {
+        return;
+      }
+
+      // Get the token that uniquely identifies this device
+      let token = await Notifications.getExpoPushTokenAsync();
+      console.log("TOKEN FOR PUSH", token);
+    } catch (error) {
+      console.log(error);
     }
-
-    // Stop here if the user did not grant permissions
-    if (finalStatus !== 'granted') {
-      return;
-    }
-
-    // Get the token that uniquely identifies this device
-    let token = await Notifications.getExpoPushTokenAsync();
-    console.log("TOKEN FOR PUSH", token);
-
   }
 
   renderMeetings() {
     const { navigation, meetings } = this.props;
-    const meeting = meetings.ids.map((id) => {
+    const meeting = meetings.ids.map(id => {
       return (
         <View key={id} style={PageStyle.eventList}>
           <ListItem
@@ -127,13 +114,14 @@ class HomePage extends Component {
               <Image
                 style={PageStyle.eventTitle}
                 source={{
-                  uri: meetings.items[id].image.url
+                  uri: meetings.items[id].image.url,
                 }}
               />
-              <Text style={PageStyle.eventDescription}>
-                {meetings.items[id].title}
+              <Text style={PageStyle.eventDescription}>{meetings.items[id].title}</Text>
+              <Text style={PageStyle.eventDate}>
+                {" "}
+                {meetings.items[id].date} | {meetings.items[id].venue.title}
               </Text>
-              <Text style={PageStyle.eventDate}> {meetings.items[id].date} | { meetings.items[id].venue.title }</Text>
               <View style={PageStyle.eventBorder} />
             </Card>
           </ListItem>
@@ -143,9 +131,8 @@ class HomePage extends Component {
     return meeting;
   }
 
-
-  featuredMeeting(){
-      const { meetings } = this.props;
+  featuredMeeting() {
+    const { meetings } = this.props;
     //Todo: featured meeting logic
     return meetings.items[meetings.ids[0]];
   }
@@ -160,14 +147,21 @@ class HomePage extends Component {
             navigation.dispatch(DrawerActions.openDrawer());
           }}
         />
-        {( meetings.hasMeetingsLoaded )? (
+        {meetings.hasMeetingsLoaded ? (
           <ScrollView>
-            <ListItem onPress={() => navigation.navigate("MeetingPage", { meetingId: this.featuredMeeting().id, status: this.state.status })}>
+            <ListItem
+              onPress={() =>
+                navigation.navigate("MeetingPage", {
+                  meetingId: this.featuredMeeting().id,
+                  status: this.state.status,
+                })
+              }
+            >
               <Card>
                 <Image
                   style={PageStyle.image}
                   source={{
-                    uri: this.featuredMeeting().image.url
+                    uri: this.featuredMeeting().image.url,
                   }}
                 />
                 <View style={PageStyle.info}>
@@ -178,18 +172,14 @@ class HomePage extends Component {
                 </View>
               </Card>
             </ListItem>
-            <Text style={{ marginLeft: 10, fontSize: 15, fontWeight: "500" }}>
-              All Meetings
-            </Text>
-            <View style={PageStyle.meetingsContainer}>
-              {this.renderMeetings()}
-            </View>
+            <Text style={{ marginLeft: 10, fontSize: 15, fontWeight: "500" }}>All Meetings</Text>
+            <View style={PageStyle.meetingsContainer}>{this.renderMeetings()}</View>
           </ScrollView>
         ) : (
-            <View style={PageStyle.loading}>
-              <ActivityIndicator loaded={(!meetings.hasMeetingsLoaded)} size="large" />
-            </View>
-          )}
+          <View style={PageStyle.loading}>
+            <ActivityIndicator loaded={!meetings.hasMeetingsLoaded} size="large" />
+          </View>
+        )}
         <TabbedMenu navigation={navigation} status={this.state.status} />
       </View>
     );
@@ -201,11 +191,11 @@ const mapStateToProps = ({ meetingsState, userState }) => {
   const { user } = userState;
   return {
     meetings,
-    user
+    user,
   };
 };
 
 export default connect(
   mapStateToProps,
-  {fetchProfile, fetchMeetings, fetchProfileAndMeetings}
+  { fetchProfile, fetchMeetings, fetchProfileAndMeetings },
 )(HomePage);
