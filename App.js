@@ -1,6 +1,4 @@
-if (__DEV__) {
-  import("./ReactotronConfig").then(() => console.log("Reactotron Configured"));
-}
+import Reactotron from "./ReactotronConfig";
 import React, { Component } from "react";
 import { Dimensions } from "react-native";
 import { createDrawerNavigator, createStackNavigator, createAppContainer } from "react-navigation";
@@ -33,13 +31,20 @@ import { SideMenu } from "./src/components";
 
 //Middleware
 import { Provider } from "react-redux";
-import { createStore, applyMiddleware } from "redux";
+import { createStore, applyMiddleware, compose } from "redux";
 import reducers from "./src/reducers";
 import reduxThunk from "redux-thunk";
 import { useScreens } from "react-native-screens";
 useScreens();
 
-const store = createStore(reducers, {}, applyMiddleware(reduxThunk));
+const store = createStore(
+  reducers,
+  {},
+  compose(
+    applyMiddleware(reduxThunk),
+    Reactotron.createEnhancer(),
+  ),
+);
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
