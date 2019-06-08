@@ -5,10 +5,11 @@ import {
   FETCH_PROFILE_FAILED,
   PROFILE_UPDATE_SUCCESS,
   PROFILE_UPDATE_FAIL,
-  SERVER_ADDRESS, FETCH_MEETING, FETCH_MEETINGS_FAILED
-} from "./types"
-  ;
-import axios from "axios";
+  SERVER_ADDRESS,
+  FETCH_MEETING,
+  FETCH_MEETINGS_FAILED,
+} from "./types";
+import { UserAPI } from "../services";
 import { fetchMeetings } from "./MeetingActions";
 import { AsyncStorage } from "react-native";
 
@@ -16,142 +17,49 @@ import { AsyncStorage } from "react-native";
 export const updateUser = ({ prop, value }) => {
   return {
     type: USER_UPDATE,
-    payload: { prop, value }
+    payload: { prop, value },
   };
 };
 
 //Retrieve user profile
-export const fetchProfileAndMeetings = (token) => async dispatch => {
+export const fetchProfileAndMeetings = token => async dispatch => {
   try {
     return dispatch(fetchProfile(token)).then(() => dispatch(fetchMeetings(token)));
   } catch (e) {
-    failedFetchProfileAndMeeting(e)
+    failedFetchProfileAndMeeting(e);
   }
-
 };
 
-export const failedFetchProfileAndMeeting = (e) => async dispatch => {
+export const failedFetchProfileAndMeeting = e => async dispatch => {
   dispatch({ type: FETCH_PROFILE_FAILED, payload: { message: e.toString() }, error: true });
-  dispatch({ type: FETCH_MEETINGS_FAILED, payload: { message: e.toString() }, error: true })
-}
+  dispatch({ type: FETCH_MEETINGS_FAILED, payload: { message: e.toString() }, error: true });
+};
 
 export const fetchProfile = (token, callback) => async dispatch => {
-
   try {
-    const request = await axios.get(`${SERVER_ADDRESS}/profile`, {
-      "headers": {
-        "Content-Type": "application/json",
-        "Authorization": token
-      }
-    });
+    const request = await UserAPI.getProfile();
     //Login Success
     dispatch({
       type: FETCH_PROFILE_RESPONSE,
-      payload: { ...request.data.data.attributes, ...{ "token": token } }
+      payload: { ...request.data.data.attributes, ...{ token: token } },
     });
     callback();
   } catch (error) {
     console.log(error);
     dispatch({ type: FETCH_PROFILE_FAILED, payload: { message: error.toString() }, error: true });
   }
-
 };
 
-
-
 export const updateProfile = (payload, token) => async dispatch => {
-  const url = `${SERVER_ADDRESS}/profile`;
   try {
-    const request = await axios.patch(url, payload, {
-      "headers": {
-        "Content-Type": "application/json",
-        "Authorization": token
-      }
-    });
-    const profile = await request.data;
+    const request = await UserAPI.updateProfile(payload);
+    const profile = request.data;
     dispatch({
       type: PROFILE_UPDATE_SUCCESS,
-      payload: { ...profile.data.attributes }
+      payload: { ...profile.data.attributes },
     });
   } catch (error) {
     console.log(error);
     dispatch({ type: PROFILE_UPDATE_FAIL, payload: { message: error.toString() }, error: true });
   }
 };
-
-// export const fetchProfile = (token) => async dispatch => {
-//   const url = `${SERVER_ADDRESS}/profile`;
-//   try {
-//     const request = await axios.get(url, {
-//         "headers": {
-//             "Content-Type": "application/json",
-//             "Authorization": token
-//         }
-//     });
-//     dispatch({
-//       type: FETCH_PROFILE,
-//       payload: request.data.data.attributes
-//     });
-//     // callback();
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-// //Create User Profile
-// export const createProfile = (form, callback) => {
-//   try {
-//     const request = await axios.POST(`${SERVER_ADDRESS}/user`, {
-//       firstName: form.firstName,
-//       lastName: form.lastName,
-//       emailAddress: form.emailAddress,
-//       position: form.position,
-//       company: form.company,
-//       contactNumber: form.contactNumber,
-//       linkedIn: form.linkedIn
-//     });
-
-//     if (request.status === "SUCCESS") {
-//       dispatch({
-//         type: PROFILE_UPDATE_SUCCESS,
-//         payload: "Profile Creation Successful"
-//       });
-//     } else {
-//       dispatch({
-//         type: PROFILE_UPDATE_FAIL,
-//         payload: "Profile Creation Failed"
-//       });
-//     }
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-// //Update User Profile
-// export const updateProfile = (form, callback) => {
-//   try {
-//     const request = await axios.post(`${SERVER_ADDRESS}/user/${form.userId}`, {
-//       firstName: form.firstName,
-//       lastName: form.lastName,
-//       emailAddress: form.emailAddress,
-//       position: form.position,
-//       company: form.company,
-//       contactNumber: form.contactNumber,
-//       linkedIn: form.linkedIn
-//     });
-
-//     if (request.status === "SUCCESS") {
-//       dispatch({
-//         type: PROFILE_UPDATE_SUCCESS,
-//         payload: "Profile Update Successful"
-//       });
-//     } else {
-//       dispatch({
-//         type: PROFILE_UPDATE_FAIL,
-//         payload: "Profile Update Failed"
-//       });
-//     }
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };

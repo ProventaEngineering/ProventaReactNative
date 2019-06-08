@@ -1,18 +1,15 @@
-import {
-  FETCH_HISTORY,
-  HISTORY_UPDATE_SUCCESS,
-  HISTORY_UPDATE_FAIL
-} from "./types";
+import { FETCH_HISTORY, HISTORY_UPDATE_SUCCESS, HISTORY_UPDATE_FAIL } from "./types";
+import { HistoryAPI } from "../services";
 
 //Retrieve list of history
-export const fetchHistory = userId => {
+export const fetchHistory = async userId => {
   try {
-    const request = await axios.GET(`${SERVER_ADDRESS}/${userId}/history`);
+    const request = await HistoryAPI.get(userId);
 
     if (request.status === "SUCCESS") {
       dispatch({
         type: FETCH_HISTORY,
-        payload: request.data
+        payload: request.data,
       });
     }
   } catch (error) {
@@ -21,53 +18,42 @@ export const fetchHistory = userId => {
 };
 
 //Create History
-export const createHistory = (form, callback) => {
+export const createHistory = async (form, callback) => {
   try {
-    const request = await axios.POST(`${SERVER_ADDRESS}/history`, {
-      userId: form.userId,
-      meetingId: form.meetingId,
-      date: form.date
-    });
-
+    const request = await HistoryAPI.create(form);
     if (request.status === "SUCCESS") {
       dispatch({
         type: HISTORY_UPDATE_SUCCESS,
-        payload: "History Log Successful"
+        payload: "History Log Successful",
       });
     } else {
       dispatch({
         type: HISTORY_UPDATE_FAIL,
-        payload: "History Log Failed"
+        payload: "History Log Failed",
       });
     }
   } catch (error) {
-    (error);
+    error;
   }
 };
 
 //Update History
-export const updateHistory = (form, callback) => {
+export const updateHistory = async (form, callback) => {
   try {
-    const request = await axios.PATCH(
-      `${SERVER_ADDRESS}/${form.userId}/history`,
-      {
-        meetingId: form.meetingId,
-        date: form.date
-      }
-    );
+    const request = await HistoryAPI.update(form);
 
     if (request.status === "SUCCESS") {
       dispatch({
         type: HISTORY_UPDATE_SUCCESS,
-        payload: "History Update Successful"
+        payload: "History Update Successful",
       });
     } else {
       dispatch({
         type: HISTORY_UPDATE_FAIL,
-        payload: "History Update Failed"
+        payload: "History Update Failed",
       });
     }
   } catch (error) {
-    (error);
+    error;
   }
 };
