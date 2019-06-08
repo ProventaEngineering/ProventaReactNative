@@ -3,7 +3,7 @@ if (__DEV__) {
 }
 import React, { Component } from "react";
 import { Dimensions } from "react-native";
-import { createDrawerNavigator, createStackNavigator, StackNavigator } from "react-navigation";
+import { createDrawerNavigator, createStackNavigator, createAppContainer } from "react-navigation";
 
 // shared routes
 import SplashPage from "./src/containers/shared/SplashPage";
@@ -36,14 +36,15 @@ import { Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
 import reducers from "./src/reducers";
 import reduxThunk from "redux-thunk";
+import { useScreens } from "react-native-screens";
+useScreens();
+
 const store = createStore(reducers, {}, applyMiddleware(reduxThunk));
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 class App extends Component {
-  componentDidMount() {
-    console.log("from root app");
-  }
+  componentDidMount() {}
 
   render() {
     return (
@@ -110,15 +111,17 @@ const RootStack = createDrawerNavigator(
   },
 );
 
-const AppStack = createStackNavigator(
-  {
-    RootStack: { screen: RootStack },
-  },
-  {
-    headerMode: "none",
-    navigationOptions: {
-      headerVisible: false,
+const AppStack = createAppContainer(
+  createStackNavigator(
+    {
+      RootStack: { screen: RootStack },
     },
-  },
+    {
+      headerMode: "none",
+      navigationOptions: {
+        headerVisible: false,
+      },
+    },
+  ),
 );
 export default App;
