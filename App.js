@@ -1,10 +1,9 @@
+if (__DEV__) {
+  import("./ReactotronConfig").then(() => console.log("Reactotron Configured"));
+}
 import React, { Component } from "react";
 import { Dimensions } from "react-native";
-import {
-  createDrawerNavigator,
-  createStackNavigator,
-  StackNavigator
-} from "react-navigation";
+import { createDrawerNavigator, createStackNavigator, StackNavigator } from "react-navigation";
 
 // shared routes
 import SplashPage from "./src/containers/shared/SplashPage";
@@ -32,20 +31,18 @@ import InboxDetailsPage from "./src/containers/signedin/InboxPage/InboxDetailsPa
 import CheckInPage from "./src/containers/signedin/CheckInPage";
 import { SideMenu } from "./src/components";
 
-
 //Middleware
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
 import reducers from "./src/reducers";
 import reduxThunk from "redux-thunk";
-
 const store = createStore(reducers, {}, applyMiddleware(reduxThunk));
-
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 class App extends Component {
   componentDidMount() {
+    console.log("from root app");
   }
 
   render() {
@@ -74,14 +71,14 @@ const SignedInStack = createStackNavigator(
     ScheduleDetailsPage: props => <ScheduleDetailsPage {...props} />,
     InboxPage: props => <InboxPage {...props} />,
     InboxDetailsPage: props => <InboxDetailsPage {...props} />,
-    CheckInPage: props => <CheckInPage {...props} />
+    CheckInPage: props => <CheckInPage {...props} />,
   },
   {
     headerMode: "none",
     navigationOptions: {
-      headerVisible: false
-    }
-  }
+      headerVisible: false,
+    },
+  },
 );
 
 const AnonymousStack = createStackNavigator(
@@ -91,37 +88,37 @@ const AnonymousStack = createStackNavigator(
     SearchPage: props => <SearchPage {...props} />,
     LoginPage: props => <LoginPage {...props} />,
     SignUpPage: props => <SignUpPage {...props} />,
-    MeetingPage: props => <MeetingPage {...props} />
+    MeetingPage: props => <MeetingPage {...props} />,
   },
   {
     intialRouteName: "SplashPage",
     headerMode: "none",
     navigationOptions: {
-      headerVisible: false
-    }
-  }
+      headerVisible: false,
+    },
+  },
 );
 
 const RootStack = createDrawerNavigator(
   {
     AnonymousStack: { screen: AnonymousStack },
-    SignedInStack: { screen: SignedInStack }
+    SignedInStack: { screen: SignedInStack },
   },
   {
     drawerWidth: SCREEN_WIDTH * 0.8,
-    contentComponent: SideMenu
-  }
+    contentComponent: SideMenu,
+  },
 );
 
 const AppStack = createStackNavigator(
   {
-    RootStack: { screen: RootStack }
+    RootStack: { screen: RootStack },
   },
   {
     headerMode: "none",
     navigationOptions: {
-      headerVisible: false
-    }
-  }
+      headerVisible: false,
+    },
+  },
 );
 export default App;
