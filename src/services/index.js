@@ -1,8 +1,8 @@
-export { default as AuthAPI } from "./auth";
-export { default as SettingsAPI } from "./settings";
-export { default as HistoryAPI } from "./history";
-export { default as MeetingsAPI } from "./meetings";
-export { default as UserAPI } from "./user";
+import * as AuthAPI from "./auth";
+import * as SettingsAPI from "./settings";
+import * as HistoryAPI from "./history";
+import * as MeetingsAPI from "./meetings";
+import * as UserAPI from "./user";
 
 export const getErrorMessage = error => {
   let errorMessage = "";
@@ -20,3 +20,5 @@ export const getErrorMessage = error => {
   }
   return errorMessage;
 };
+
+export { AuthAPI, SettingsAPI, HistoryAPI, MeetingsAPI, UserAPI };
