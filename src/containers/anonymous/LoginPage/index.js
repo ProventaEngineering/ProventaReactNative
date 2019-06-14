@@ -79,7 +79,7 @@ class LoginPage extends Component {
           `https://www.linkedin.com/oauth/v2/authorization?response_type=code` +
           `&client_id=${LINKEDIN_CLIENT_ID}` +
           `&redirect_uri=${encodeURIComponent(redirectUrl)}` +
-          `&scope=r_basicprofile%20r_emailaddress%20w_member_social`,
+          `&scope=r_liteprofile%20r_emailaddress%20w_member_social`,
       });
       const {
         params: { code },
@@ -89,9 +89,7 @@ class LoginPage extends Component {
         client_id: LINKEDIN_CLIENT_ID,
         redirect_uri: redirectUrl,
       });
-      const { access_token } = authResult.data;
-      const linkedInProfile = await AuthAPI.getLinkedInProfile(access_token);
-      console.log("linkedInProfile", linkedInProfile);
+      console.log(authResult.data);
     } catch (error) {
       console.log("loginWithLinkedIn error", error);
     }
