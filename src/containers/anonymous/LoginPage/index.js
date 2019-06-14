@@ -21,7 +21,7 @@ import { DrawerActions } from "react-navigation";
 import { connect } from "react-redux";
 import { updateAuth, login, fetchProfile, fetchMeetings } from "../../../actions";
 import { Google, AuthSession } from "expo";
-import * as API from "../../../services";
+import { AuthAPI } from "../../../services";
 // import Expo from 'expo';
 const LINKEDIN_CLIENT_ID = "81opzafzg88o93";
 class LoginPage extends Component {
@@ -84,13 +84,13 @@ class LoginPage extends Component {
       const {
         params: { code },
       } = result;
-      const authResult = await API.authLinkedIn({
+      const authResult = await AuthAPI.authLinkedIn({
         code,
         client_id: LINKEDIN_CLIENT_ID,
         redirect_uri: redirectUrl,
       });
       const { access_token } = authResult.data;
-      const linkedInProfile = await API.getLinkedInProfile(access_token);
+      const linkedInProfile = await AuthAPI.getLinkedInProfile(access_token);
       console.log("linkedInProfile", linkedInProfile);
     } catch (error) {
       console.log("loginWithLinkedIn error", error);
