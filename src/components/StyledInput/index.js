@@ -3,9 +3,9 @@ import { View, Image, TextInput } from "react-native";
 import ComponentStyle from "./styles";
 
 const images = {
-  visibilityIcon: require('../../assets/login_eye.png'),
-  userIcon: require('../../assets/login_user.png'),
-  passwordIcon: require('../../assets/login_password.png'),
+  visibilityIcon: require("../../assets/login_eye.png"),
+  userIcon: require("../../assets/login_user.png"),
+  passwordIcon: require("../../assets/login_password.png"),
 };
 
 class StyledInput extends Component {
@@ -29,20 +29,23 @@ class StyledInput extends Component {
     return (
       <View style={ComponentStyle.searchSection}>
         <View style={ComponentStyle.leftIcon}>
-          <Image style={ComponentStyle.icon} source={type === 'email' ? images.userIcon : images.passwordIcon} />
+          <Image
+            style={ComponentStyle.icon}
+            source={type === "email" ? images.userIcon : images.passwordIcon}
+          />
         </View>
         <View style={ComponentStyle.centerBorder}>
           <TextInput
             style={ComponentStyle.input}
             placeholder={placeholder}
             onChangeText={onChangeText}
+            secureTextEntry={type === "password"}
+            autoCapitalize="none"
+            autoCompleteType="off"
+            autoCorrect={false}
           />
         </View>
-        {this.renderRightIcon(
-          type,
-          placeholder,
-          onChangeText
-        )}
+        {this.renderRightIcon(type, placeholder, onChangeText)}
       </View>
     );
   }
