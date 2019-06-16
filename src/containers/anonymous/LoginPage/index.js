@@ -26,15 +26,26 @@ import { AuthAPI } from "../../../services";
 const LINKEDIN_CLIENT_ID = "81opzafzg88o93";
 class LoginPage extends Component {
   state = {
-    isFetching: null,
-    authError: "",
-    user: null,
+    email: "",
+    password: "",
   };
-  async componentDidMount() {
-    console.log({ Google });
+  componentDidMount() {
     // this.syncUserWithStateAsync();
   }
-
+  componentDidUpdate() {
+    const { token, user, status, meetings, navigation } = this.props;
+    console.log("props", this.props);
+    const { hasProfileLoaded, profile } = user;
+    const { hasMeetingsLoaded } = meetings;
+    if (token) {
+      this.storeToken(token);
+      if (status === "loggedin" && hasProfileLoaded && hasMeetingsLoaded) {
+        const meetingId = profile.meetingIds.count > 0 ? profile.meetingIds[0] : meetings.ids[0];
+        navigation.navigate("MeetingLoginPage", { status: "loggedin", meetingId: meetingId });
+      }
+    }
+  }
+  onChangeText = type => value => this.setState({ [type]: value });
   syncUserWithStateAsync = async () => {
     const user = await Google.signInSilentlyAsync();
     this.setState({ user });
@@ -42,19 +53,9 @@ class LoginPage extends Component {
 
   loginWithGoogle = async () => {
     try {
-      console.log("start logging in");
       const result = await Google.logInAsync({
         clientId: "6966997513-s5mroeevftu0i8l0a8rmm35c5cv9v12p.apps.googleusercontent.com",
-        // iosClientId: "6966997513-s5mroeevftu0i8l0a8rmm35c5cv9v12p.apps.googleusercontent.com",
-        // iosStandaloneAppClientId: `6966997513-bhctt6ajg1b5l2gakrgq7527vs0ikvgm.apps.googleusercontent.com`,
-        // androidClientId: "6966997513-s5mroeevftu0i8l0a8rmm35c5cv9v12p.apps.googleusercontent.com",
-        // scopes: ["profile", "email"],
-        // behavior: "web",
       });
-
-      console.log(result);
-      alert(JSON.stringify(result.user));
-
       if (result.type === "success") {
         return result.accessToken;
       } else {
@@ -65,11 +66,14 @@ class LoginPage extends Component {
       return { error: true };
     }
   };
-
   cacheAuthAsync(authState) {
     return AsyncStorage.setItem(StorageKey, JSON.stringify(authState));
   }
-
+  storeToken = async token => {
+    try {
+      await AsyncStorage.setItem("token", token);
+    } catch (error) {}
+  };
   loginWithLinkedIn = async () => {
     try {
       const redirectUrl = AuthSession.getRedirectUrl();
@@ -84,17 +88,25 @@ class LoginPage extends Component {
       const {
         params: { code },
       } = result;
-      const authResult = await AuthAPI.authLinkedIn({
+
+      this.doLogin({
         code,
         client_id: LINKEDIN_CLIENT_ID,
         redirect_uri: redirectUrl,
+        type: "linkedin",
       });
-      console.log(authResult.data);
     } catch (error) {
       console.log("loginWithLinkedIn error", error);
     }
   };
-
+  loginUser = () => {
+    const { email, password } = this.state;
+    this.doLogin({ email, password, type: "email" });
+  };
+  doLogin = data => {
+    const { login } = this.props;
+    login(data);
+  };
   renderSocialLinks() {
     return (
       <View style={PageStyle.socialContainer}>
@@ -123,56 +135,18 @@ class LoginPage extends Component {
         <StyledInput
           type="email"
           placeholder="Email Address"
-          onChangeText={value => {
-            this.props.updateAuth({ prop: "emailAddress", value });
-          }}
+          onChangeText={this.onChangeText("email")}
         />
         <StyledInput
           type="password"
           placeholder="Password"
-          onChangeText={value => {
-            this.props.updateAuth({ prop: "password", value });
-          }}
+          onChangeText={this.onChangeText("password")}
         />
       </View>
     );
   }
-
-  storeToken = async token => {
-    try {
-      await AsyncStorage.setItem("token", token);
-    } catch (error) {}
-  };
-
-  loginUser() {
-    const { emailAddress, password } = this.props;
-    const data = {
-      email: emailAddress.value,
-      password: password.value,
-    };
-    this.setState({ isFetching: true, authError: "" });
-    this.props.login(data).then(() => {
-      if (this.props.token) {
-        this.storeToken(this.props.token);
-        this.props.fetchProfile(this.props.token).then(() => {
-          this.props.fetchMeetings(this.props.token).then(() => {
-            const { status, navigation, user, meetings } = this.props;
-            if (status === "loggedin" && user.hasProfileLoaded && meetings.hasMeetingsLoaded) {
-              this.setState({ isFetching: false });
-              const meetingId =
-                user.profile.meetingIds.count > 0 ? user.profile.meetingIds[0] : meetings.ids[0];
-              navigation.navigate("MeetingLoginPage", { status: "loggedin", meetingId: meetingId });
-            }
-          });
-        });
-      } else {
-        this.setState({ isFetching: false, authError: "Invalid Credentials" });
-      }
-    });
-  }
-
   render() {
-    const { navigation, meetings, status, user, token } = this.props;
+    const { navigation, meetings, message, loading } = this.props;
     return (
       <View style={PageStyle.container}>
         <Header
@@ -183,30 +157,23 @@ class LoginPage extends Component {
         />
         <ScrollView>
           <View style={ComponentStyle.container}>
-            {(this.state.isFetching === null || this.state.isFetching === false) && (
+            {loading ? (
+              <View style={PageStyle.loading}>
+                <ActivityIndicator loaded={meetings.hasMeetingsLoaded} size="large" />
+              </View>
+            ) : (
               <View style={PageStyle.card}>
                 {this.renderLoginForm()}
-                <MainButton
-                  onPress={() => {
-                    this.loginUser();
-                  }}
-                  label="LOGIN"
-                />
+                <MainButton onPress={this.loginUser} label="LOGIN" />
                 <View style={PageStyle.errorContainer}>
-                  <Text style={PageStyle.errorText}> {this.state.authError} </Text>
+                  <Text style={PageStyle.errorText}>{message}</Text>
                 </View>
-
                 <View style={PageStyle.sectionLine} />
                 {this.renderSocialLinks()}
                 <Text style={PageStyle.signUpLabel}>Don't have an account?</Text>
                 <TouchableOpacity onPress={() => navigation.navigate("SignUpPage")}>
                   <Text style={PageStyle.signUpLink}> Sign up now </Text>
                 </TouchableOpacity>
-              </View>
-            )}
-            {this.state.isFetching && (
-              <View style={PageStyle.loading}>
-                <ActivityIndicator loaded={meetings.hasMeetingsLoaded} size="large" />
               </View>
             )}
           </View>
@@ -218,13 +185,14 @@ class LoginPage extends Component {
 }
 
 const mapStateToProps = ({ auth, userState, meetingsState }) => {
-  const { status, message, emailAddress, password, token } = auth;
+  const { status, message, emailAddress, password, token, loading } = auth;
   const { user } = userState;
   const { meetings } = meetingsState;
-  return { status, message, emailAddress, password, token, user, meetings };
+  return { status, message, emailAddress, password, token, user, meetings, loading };
 };
 
+const mapDispatchToProps = { login, updateAuth, fetchProfile, fetchMeetings };
 export default connect(
   mapStateToProps,
-  { login, updateAuth, fetchProfile, fetchMeetings },
+  mapDispatchToProps,
 )(LoginPage);
