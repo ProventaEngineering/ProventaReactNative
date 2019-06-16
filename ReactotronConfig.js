@@ -1,6 +1,8 @@
 import Reactotron from "reactotron-react-native";
 import { reactotronRedux } from "reactotron-redux";
-const reactotron = Reactotron.configure({ host: "192.168.254.100" }) // controls connection & communication settings
+const reactotron = Reactotron.configure({
+  // host: "192.168.254.108",
+})
   .useReactNative({
     networking: {
       ignoreUrls: /\/(logs|symbolicate)$/,
