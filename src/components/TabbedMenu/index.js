@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, ActivityIndicator} from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import ComponentStyle from "./styles";
 import { MenuButton } from "../MenuButton";
 import PageStyle from "../../containers/shared/MeetingPage/styles";
@@ -31,7 +31,7 @@ class TabbedMenu extends Component {
   renderSignedIn() {
     const { navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
-    if(meetingId !== undefined) {
+    if (meetingId !== undefined) {
       return (
         <View style={ComponentStyle.container}>
           <MenuButton
@@ -42,7 +42,7 @@ class TabbedMenu extends Component {
               navigation.navigate("MeetingLoginPage", {
                 meetingId: meetingId,
                 status: "loggedin",
-                content: "settings"
+                content: "settings",
               })
             }
           />
@@ -53,7 +53,7 @@ class TabbedMenu extends Component {
             onPress={() =>
               navigation.navigate("InformationPage", {
                 status: "loggedin",
-                meetingId: meetingId
+                meetingId: meetingId,
               })
             }
           />
@@ -63,9 +63,9 @@ class TabbedMenu extends Component {
             label="Menu"
             onPress={() =>
               navigation.navigate("InformationDetailsPage", {
-                content: 'PERSONAL SCHEDULE',
+                content: "PERSONAL SCHEDULE",
                 status: "loggedin",
-                meetingId: meetingId
+                meetingId: meetingId,
               })
             }
           />
@@ -83,7 +83,7 @@ class TabbedMenu extends Component {
           />
         </View>
       );
-    }else{
+    } else {
       return (
         <View style={ComponentStyle.container}>
           <MenuButton
@@ -111,15 +111,14 @@ class TabbedMenu extends Component {
       //   </View>
       // );
     }
-
-
   }
 
   render() {
-    const { status } = this.props;
-    if (status == "loggedin") {
-      return this.renderSignedIn();
-    } else return this.renderAnonymous();
+    // const { status } = this.props;
+    // if (status == "loggedin") {
+    //   return this.renderSignedIn();
+    // } else return this.renderAnonymous();
+    return null;
   }
 }
 
