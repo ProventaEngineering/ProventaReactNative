@@ -1,7 +1,12 @@
 import Reactotron from "./ReactotronConfig";
 import React, { Component } from "react";
-import { Dimensions } from "react-native";
-import { createDrawerNavigator, createStackNavigator, createAppContainer } from "react-navigation";
+import { Dimensions, AsyncStorage, Image, StyleSheet } from "react-native";
+import {
+  createDrawerNavigator,
+  createStackNavigator,
+  createBottomTabNavigator,
+  createAppContainer,
+} from "react-navigation";
 
 // shared routes
 import SplashPage from "./src/containers/shared/SplashPage";
@@ -37,6 +42,11 @@ import reduxThunk from "redux-thunk";
 import { useScreens } from "react-native-screens";
 useScreens();
 
+import { BLUE } from "./src/styles/common";
+const searchIcon = require("./src/assets/search_button.png");
+const homeIcon = require("./src/assets/home_button.png");
+const loginIcon = require("./src/assets/login_button.png");
+
 const store = createStore(
   reducers,
   {},
@@ -47,18 +57,6 @@ const store = createStore(
 );
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
-
-class App extends Component {
-  componentDidMount() {}
-
-  render() {
-    return (
-      <Provider store={store}>
-        <AppStack />
-      </Provider>
-    );
-  }
-}
 
 const SignedInStack = createStackNavigator(
   {
@@ -87,46 +85,76 @@ const SignedInStack = createStackNavigator(
   },
 );
 
-const AnonymousStack = createStackNavigator(
+const AnonymousTabNavigator = createBottomTabNavigator(
   {
-    SplashPage: props => <SplashPage {...props} />,
-    HomePage: props => <HomePage {...props} />,
-    SearchPage: props => <SearchPage {...props} />,
-    LoginPage: props => <LoginPage {...props} />,
-    SignUpPage: props => <SignUpPage {...props} />,
-    MeetingPage: props => <MeetingPage {...props} />,
+    SearchPage: {
+      screen: SearchPage,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => <Image style={{ tintColor }} source={searchIcon} />,
+      },
+    },
+    HomePage: {
+      screen: HomePage,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => <Image style={{ tintColor }} source={homeIcon} />,
+      },
+    },
+    LoginPage: {
+      screen: LoginPage,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => <Image style={{ tintColor }} source={loginIcon} />,
+      },
+    },
   },
   {
-    intialRouteName: "SplashPage",
-    headerMode: "none",
-    navigationOptions: {
-      headerVisible: false,
+    initialRouteName: "HomePage",
+    defaultNavigationOptions: {
+      tabBarOptions: {
+        activeTintColor: BLUE,
+        inactiveTintColor: "#C3C3C3",
+        showLabel: false,
+      },
     },
   },
 );
 
 const RootStack = createDrawerNavigator(
   {
-    AnonymousStack: { screen: AnonymousStack },
-    SignedInStack: { screen: SignedInStack },
+    AnonymousStack: { screen: AnonymousTabNavigator },
+    // SignedInStack: { screen: SignedInStack },
   },
   {
     drawerWidth: SCREEN_WIDTH * 0.8,
     contentComponent: SideMenu,
+    headerMode: "none",
   },
 );
 
-const AppStack = createAppContainer(
-  createStackNavigator(
-    {
-      RootStack: { screen: RootStack },
-    },
-    {
-      headerMode: "none",
-      navigationOptions: {
-        headerVisible: false,
-      },
-    },
-  ),
+const AppStack = createAppContainer(RootStack
+  // createStackNavigator(
+  //   {
+  //     RootStack: { screen: RootStack },
+  //   },
+  //   {
+  //     headerMode: "none",
+  //     defaultNavigationOptions: {
+  //       headerMode: "none",
+  //     },
+  //   },
+  // ),
 );
+
+class App extends Component {
+  componentDidMount() {
+    AsyncStorage.clear();
+  }
+
+  render() {
+    return (
+      <Provider store={store}>
+        <AppStack />
+      </Provider>
+    );
+  }
+}
 export default App;
