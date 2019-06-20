@@ -242,7 +242,7 @@ const AppStack = createAppContainer(
 
 class App extends Component {
   componentDidMount() {
-    AsyncStorage.clear();
+    // AsyncStorage.clear();
   }
 
   render() {
