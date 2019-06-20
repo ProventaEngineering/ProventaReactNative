@@ -6,6 +6,7 @@ import {
   createStackNavigator,
   createBottomTabNavigator,
   createAppContainer,
+  createSwitchNavigator,
 } from "react-navigation";
 
 // shared routes
@@ -60,8 +61,6 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const SignedInStack = createStackNavigator(
   {
-    // SplashPage: props => <SplashPage {...props} />,
-    // HomePage: props => <HomePage {...props} />,
     MeetingLoginPage: props => <MeetingPage {...props} />,
     SettingsPage: props => <SettingsPage {...props} />,
     // insert user, calendar and notification if in use
@@ -85,6 +84,15 @@ const SignedInStack = createStackNavigator(
   },
 );
 
+const LoginTabStackNavigator = createStackNavigator(
+  {
+    LoginPage,
+    SignUpPage,
+  },
+  {
+    headerMode: "none",
+  },
+);
 const AnonymousTabNavigator = createBottomTabNavigator(
   {
     SearchPage: {
@@ -100,7 +108,7 @@ const AnonymousTabNavigator = createBottomTabNavigator(
       },
     },
     LoginPage: {
-      screen: LoginPage,
+      screen: LoginTabStackNavigator,
       navigationOptions: {
         tabBarIcon: ({ tintColor }) => <Image style={{ tintColor }} source={loginIcon} />,
       },
@@ -118,10 +126,85 @@ const AnonymousTabNavigator = createBottomTabNavigator(
   },
 );
 
-const RootStack = createDrawerNavigator(
+const SignedInTabNavigator = createBottomTabNavigator(
   {
-    AnonymousStack: { screen: AnonymousTabNavigator },
-    // SignedInStack: { screen: SignedInStack },
+    MeetingLoginPage: {
+      screen: MeetingPage,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => <Image style={{ tintColor }} source={homeIcon} />,
+      },
+    },
+    InformationPage: {
+      screen: InformationPage,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Image style={{ tintColor }} source={require("./src/assets/info_button.png")} />
+        ),
+      },
+    },
+    InformationDetailsPage: {
+      screen: InformationDetailsPage,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Image style={{ tintColor }} source={require("./src/assets/schedule_button.png")} />
+        ),
+      },
+    },
+    InboxPage: {
+      screen: InboxPage,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Image style={{ tintColor }} source={require("./src/assets/inbox_button.png")} />
+        ),
+      },
+    },
+    CheckInPage: {
+      screen: CheckInPage,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Image style={{ tintColor }} source={require("./src/assets/checkin_button.png")} />
+        ),
+      },
+    },
+  },
+  {
+    initialRouteName: "MeetingLoginPage",
+    defaultNavigationOptions: {
+      tabBarOptions: {
+        activeTintColor: BLUE,
+        inactiveTintColor: "#C3C3C3",
+        showLabel: false,
+      },
+      tabBarOnPress: ({ navigation, defaultHandler }) => {
+        const {
+          state: { routeName },
+        } = navigation;
+        const meetingId = navigation.getParam("meetingId");
+        let params = {
+          meetingId,
+          status: "loggedin",
+        };
+        if (routeName === "MeetingLoginPage") {
+          params = { ...params, content: "settings" };
+        } else if (routeName === "InformationPage") {
+          params = { ...params };
+        } else if (routeName === "InformationDetailsPage") {
+          params = { ...params, status: "loggedin", content: "PERSONAL SCHEDULE" };
+        } else if (routeName === "InboxPage") {
+          params = {};
+        } else if (routeName === "MeetingLoginPage") {
+          params = {};
+        }
+        navigation.setParams(params);
+        defaultHandler();
+      },
+    },
+  },
+);
+
+const AnonymousDrawerNavigator = createDrawerNavigator(
+  {
+    AnonymousTab: { screen: AnonymousTabNavigator },
   },
   {
     drawerWidth: SCREEN_WIDTH * 0.8,
@@ -130,18 +213,31 @@ const RootStack = createDrawerNavigator(
   },
 );
 
-const AppStack = createAppContainer(RootStack
-  // createStackNavigator(
-  //   {
-  //     RootStack: { screen: RootStack },
-  //   },
-  //   {
-  //     headerMode: "none",
-  //     defaultNavigationOptions: {
-  //       headerMode: "none",
-  //     },
-  //   },
-  // ),
+const SignedInDrawerNavigator = createDrawerNavigator(
+  {
+    SignedInStack: { screen: SignedInTabNavigator },
+  },
+  {
+    drawerWidth: SCREEN_WIDTH * 0.8,
+    contentComponent: SideMenu,
+    headerMode: "none",
+  },
+);
+
+const AppStack = createAppContainer(
+  createSwitchNavigator(
+    {
+      Anonymous: AnonymousDrawerNavigator,
+      Signed: SignedInDrawerNavigator,
+    },
+    {
+      initialRouteName: "Anonymous",
+      headerMode: "none",
+      defaultNavigationOptions: {
+        headerMode: "none",
+      },
+    },
+  ),
 );
 
 class App extends Component {
