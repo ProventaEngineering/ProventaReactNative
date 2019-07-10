@@ -3,26 +3,21 @@ import { Image, View, AsyncStorage } from "react-native";
 import PageStyle from "./styles";
 import { connect } from "react-redux";
 import * as actions from "../../../actions";
-
+import { setDefaultHeaders } from "../../../services/client";
 class SplashPage extends Component {
-
   async componentDidMount() {
     try {
       const { navigation } = this.props;
-      const token = await AsyncStorage.getItem('token');
+      const token = await AsyncStorage.getItem("token");
       if (token !== null) {
-        console.log('HomePage', token);
-        setTimeout(() => {
-          this.props.updateStatus(token).then(() => {
-            const { status } = this.props;
-            navigation.navigate("MeetingPage", { meetingId: 35, status });
-          });
-        }, 2000);
+        setDefaultHeaders({ Authorization: token });
+        this.props.updateStatus(token).then(() => {
+          const { status } = this.props;
+          navigation.navigate("Signed", { meetingId: 35, status });
+        });
+      } else {
+        this.props.navigation.navigate("Anonymous", { meetingId: 35, status: "loggedout" });
       }
-      setTimeout(() => {
-        this.props.navigation.navigate("HomePage", { meetingId: 35, status: "loggedout" });
-      }, 2000);
-
     } catch (error) {
       // Error retrieving data
     }
@@ -30,7 +25,7 @@ class SplashPage extends Component {
 
   render() {
     return (
-      <View style={PageStyle.container} >
+      <View style={PageStyle.container}>
         <Image
           style={PageStyle.splashScreen}
           source={require("../../../assets/splash_image.png")}
@@ -40,16 +35,15 @@ class SplashPage extends Component {
   }
 }
 
-
 const mapStatetoProps = ({ auth }) => {
   const { status, token } = auth;
   return {
     status,
-    token
+    token,
   };
 };
 
 export default connect(
   mapStatetoProps,
-  actions
+  actions,
 )(SplashPage);
