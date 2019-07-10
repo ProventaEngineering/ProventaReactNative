@@ -17,6 +17,19 @@ import * as actions from "../../../../actions";
 import ComponentStyle from "../../../../components/TabbedMenu/styles";
 
 class InformationDetailsPage extends Component {
+  getMeetingId = () => {
+    const { navigation, user, meetings } = this.props;
+    const meetingId = navigation.getParam("meetingId");
+    if (meetingId == undefined || meetingId == null) {
+      if (user.profile.meetingIds.length > 0) {
+        return user.profile.meetingIds[0];
+      } else {
+        return meetings.ids[0];
+      }
+    }
+    return meetingId;
+  };
+
   removeDuplicatesBy(keyFn, array) {
     var mySet = new Set();
     return array.filter(function(x) {
@@ -29,7 +42,7 @@ class InformationDetailsPage extends Component {
 
   renderFacilitators() {
     const { navigation, meetings } = this.props;
-    const meetingId = navigation.getParam("meetingId");
+    const meetingId = this.getMeetingId();
     const meeting = meetings.items[meetingId];
     const facilitatorCopy = this.removeDuplicatesBy(x => x.id, meeting.facilitators);
     const facilitator = facilitatorCopy.map(
@@ -82,7 +95,7 @@ class InformationDetailsPage extends Component {
 
   renderParticipants() {
     const { navigation, meetings } = this.props;
-    const meetingId = navigation.getParam("meetingId");
+    const meetingId = this.getMeetingId();
     const meeting = meetings.items[meetingId];
     const participant = meeting.participants.map(
       ({ id, first_name, last_name, position, company, linkedin }, index, participants) => {
@@ -127,7 +140,7 @@ class InformationDetailsPage extends Component {
 
   renderSponsors() {
     const { navigation, meetings } = this.props;
-    const meetingId = navigation.getParam("meetingId");
+    const meetingId = this.getMeetingId();
     const meeting = meetings.items[meetingId];
     const sponsor = meeting.sponsors.map(({ id, title, image, website }) => {
       return (
@@ -149,7 +162,7 @@ class InformationDetailsPage extends Component {
 
   renderPersonalSchedule() {
     const { navigation, meetings } = this.props;
-    const meetingId = navigation.getParam("meetingId");
+    const meetingId = this.getMeetingId();
     const meeting = meetings.items[meetingId];
 
     const session = meeting.personalizeAgenda.schedules.map(({ subject, time }) => {
@@ -214,7 +227,7 @@ class InformationDetailsPage extends Component {
     const { navigation, meetings } = this.props;
     const content = navigation.getParam("content");
     const route = navigation.getParam("previousRoute");
-    const meetingId = navigation.getParam("meetingId");
+    let meetingId = this.getMeetingId();
     if (meetings.hasMeetingsLoaded) {
       return (
         <View style={PageStyle.container}>
@@ -257,7 +270,7 @@ class InformationDetailsPage extends Component {
   }
 }
 
-const mapStatetoProps = ({ meetingsState, auth, userState }) => {
+const mapStateToProps = ({ meetingsState, auth, userState }) => {
   const { meeting, hasLoadedMeeting } = meetingsState;
   const { meetings } = meetingsState;
   const { user } = userState;
@@ -272,6 +285,6 @@ const mapStatetoProps = ({ meetingsState, auth, userState }) => {
   };
 };
 export default connect(
-  mapStatetoProps,
+  mapStateToProps,
   { actions },
 )(InformationDetailsPage);
