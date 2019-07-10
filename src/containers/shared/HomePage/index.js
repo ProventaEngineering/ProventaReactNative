@@ -17,14 +17,9 @@ class HomePage extends Component {
     try {
       this.registerForPushNotificationsAsync();
       this.notificationSubscription = Notifications.addListener(this.handleNotification);
-
-      const token = await AsyncStorage.getItem("token");
-      if (token == null || token == undefined) {
-        this.setState({ status: "loggedout" }, () => {
-          this.props.fetchMeetings();
-        });
-      }
+      this.props.fetchMeetings();
     } catch (error) {
+      console.log("HomePage error", error);
       // Error retrieving data
     }
   }
