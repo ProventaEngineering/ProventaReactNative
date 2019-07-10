@@ -1,6 +1,6 @@
 import Reactotron from "./ReactotronConfig";
 import React, { Component } from "react";
-import { Dimensions, AsyncStorage, Image, StyleSheet } from "react-native";
+import { Dimensions, AsyncStorage, Image, ActivityIndicator } from "react-native";
 import {
   createDrawerNavigator,
   createStackNavigator,
@@ -61,7 +61,7 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const SignedInStack = createStackNavigator(
   {
-    MeetingLoginPage: props => <MeetingPage {...props} />,
+    MeetingPage: props => <MeetingPage {...props} />,
     SettingsPage: props => <SettingsPage {...props} />,
     // insert user, calendar and notification if in use
     CalendarPage: props => <CalendarPage {...props} />,
@@ -202,6 +202,23 @@ const SignedInTabNavigator = createBottomTabNavigator(
   },
 );
 
+const SignedInStackNavigator = createStackNavigator(
+  {
+    MeetingLoginPage: SignedInTabNavigator,
+    SchedulePage,
+    SettingsPage,
+    UserPage,
+    CalendarPage,
+    NotificationPage,
+  },
+  {
+    headerMode: "none",
+    navigationOptions: {
+      headerVisible: false,
+    },
+  },
+);
+
 const AnonymousDrawerNavigator = createDrawerNavigator(
   {
     AnonymousTab: { screen: AnonymousTabNavigator },
@@ -215,7 +232,7 @@ const AnonymousDrawerNavigator = createDrawerNavigator(
 
 const SignedInDrawerNavigator = createDrawerNavigator(
   {
-    SignedInStack: { screen: SignedInTabNavigator },
+    SignedInStack: { screen: SignedInStackNavigator },
   },
   {
     drawerWidth: SCREEN_WIDTH * 0.8,
@@ -229,9 +246,10 @@ const AppStack = createAppContainer(
     {
       Anonymous: AnonymousDrawerNavigator,
       Signed: SignedInDrawerNavigator,
+      Splash: SplashPage,
     },
     {
-      initialRouteName: "Anonymous",
+      initialRouteName: "Splash",
       headerMode: "none",
       defaultNavigationOptions: {
         headerMode: "none",
@@ -239,7 +257,6 @@ const AppStack = createAppContainer(
     },
   ),
 );
-
 class App extends Component {
   componentDidMount() {
     // AsyncStorage.clear();
