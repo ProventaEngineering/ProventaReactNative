@@ -72,12 +72,12 @@ export const login = data => async dispatch => {
     const { auth_token } = request.data;
     if (auth_token.length > 0) {
       setDefaultHeaders({ Authorization: auth_token });
+      await fetchProfile()(dispatch);
+      await fetchMeetings()(dispatch);
       dispatch({
         type: AUTH_LOGIN_SUCCESS,
         payload: auth_token,
       });
-      fetchProfile()(dispatch);
-      fetchMeetings()(dispatch);
     } else {
       dispatch({
         type: AUTH_LOGIN_FAIL,
