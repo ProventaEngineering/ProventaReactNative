@@ -43,7 +43,7 @@ export const fetchProfile = (token, callback) => async dispatch => {
       type: FETCH_PROFILE_RESPONSE,
       payload: { ...request.data.data.attributes, ...{ token: token } },
     });
-    callback();
+    if (callback) callback();
   } catch (error) {
     console.log(error);
     dispatch({ type: FETCH_PROFILE_FAILED, payload: { message: error.toString() }, error: true });
