@@ -77,7 +77,7 @@ class InformationPage extends Component {
             </View>
             <View style={PageStyle.menuBorder} />
           </ListItem>
-        </View >
+        </View>
       );
     });
 

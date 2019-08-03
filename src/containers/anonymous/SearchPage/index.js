@@ -25,9 +25,10 @@ class SearchPage extends Component {
         description: "HR Leaders Strategy Meeting APAC",
         event: "Hongkong 2018"
       }
-    ]
+    ],
+    searchText: ""
   };
-
+  onChangeTextSearch = searchText => this.setState({ searchText });
   renderSearches(searches) {
     const { navigation } = this.props;
     const search = searches.map(({ id, title, description, event }) => {
@@ -50,6 +51,7 @@ class SearchPage extends Component {
 
   render() {
     const { navigation } = this.props;
+    const { searchText } = this.state;
     return (
       <View style={PageStyle.container}>
         <Header
@@ -63,7 +65,8 @@ class SearchPage extends Component {
                 autoCapitalize="none"
                 autoCorrect={false}
                 placeholder="Search"
-                value=""
+                onChangeText={this.onChangeTextSearch}
+                value={searchText}
               />
             </View>
             <View style={PageStyle.searchButtonContainer}>

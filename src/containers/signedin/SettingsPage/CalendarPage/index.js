@@ -4,7 +4,10 @@ import { View, Text, Switch } from "react-native";
 // import RNCalendarEvents from "react-native-calendar-events";
 import { Header, Card, ListItem, TabbedMenu } from "../../../../components";
 import PageStyle from "./styles";
-import { fetchCalendarSettings, updateCalendarSettings } from "../../../../actions";
+import {
+  fetchCalendarSettings,
+  updateCalendarSettings
+} from "../../../../actions";
 import { Permissions, Calendar } from "expo";
 
 class CalendarPage extends Component {
@@ -83,12 +86,12 @@ class CalendarPage extends Component {
 
   resolvePromises(promise, meetingItems, i) {
     return promise
-      .then(function () {
-        return new Promise(function (r) {
+      .then(function() {
+        return new Promise(function(r) {
           return setTimeout(r, 300);
         });
       })
-      .then(function () {
+      .then(function() {
         RNCalendarEvents.saveEvent(meetingItems[i].title, {
           location: meetingItems[i].floorplan.location,
           startDate: meetingItems[i].startDate.toISOString(),
@@ -99,11 +102,10 @@ class CalendarPage extends Component {
 
   componentDidMount() {
     const { user } = this.props;
-    this.props.fetchCalendarSettings(user.profile.token).then(() => {
+    this.props.fetchCalendarSettings().then(() => {
       this.loadInitialData();
     });
   }
-
 
   loadInitialData() {
     const { calendar } = this.props;
@@ -123,26 +125,32 @@ class CalendarPage extends Component {
 
     if (i === 0) {
       options[i].toggleStatus = !options[i].toggleStatus;
-      this.setState({
-        options
-      }, () => {
-        const options = [...this.state.calendarItems];
-        const data = {
-          "calendarGoogle": this.state.calendarItems[0].toggleStatus,
-        };
-        this.props.updateCalendarSettings(data, token, "google")
-      });
+      this.setState(
+        {
+          options
+        },
+        () => {
+          const options = [...this.state.calendarItems];
+          const data = {
+            calendarGoogle: this.state.calendarItems[0].toggleStatus
+          };
+          this.props.updateCalendarSettings(data, "google");
+        }
+      );
     } else if (i === 1) {
       options[i].toggleStatus = !options[i].toggleStatus;
-      this.setState({
-        options
-      }, () => {
-        const options = [...this.state.calendarItems];
-        const data = {
-          "calendarIcalendar": this.state.calendarItems[1].toggleStatus
-        };
-        this.props.updateCalendarSettings(data, token, "calendar")
-      });
+      this.setState(
+        {
+          options
+        },
+        () => {
+          const options = [...this.state.calendarItems];
+          const data = {
+            calendarIcalendar: this.state.calendarItems[1].toggleStatus
+          };
+          this.props.updateCalendarSettings(data, token, "calendar");
+        }
+      );
     }
 
     if (
@@ -154,7 +162,7 @@ class CalendarPage extends Component {
       options[i].label === "Sync to Phone Calendar" &&
       options[i].toggleStatus === true
     ) {
-      alert("Synced to Phone Calendar")
+      alert("Synced to Phone Calendar");
     }
   }
 
@@ -193,7 +201,6 @@ class CalendarPage extends Component {
   render() {
     const { navigation } = this.props;
 
-
     return (
       <View style={PageStyle.container}>
         <Header
@@ -215,8 +222,8 @@ const mapStatetoProps = ({ userState, auth, settingsState }) => {
   const { user, hasProfileUpdated } = userState;
   const { token } = auth;
   const { calendar } = settingsState;
-  return { token, user, hasProfileUpdated, calendar }
-}
+  return { token, user, hasProfileUpdated, calendar };
+};
 
 export default connect(
   mapStatetoProps,

@@ -1,12 +1,17 @@
 import Reactotron from "./ReactotronConfig";
 import React, { Component } from "react";
-import { Dimensions, AsyncStorage, Image, ActivityIndicator } from "react-native";
+import {
+  Dimensions,
+  AsyncStorage,
+  Image,
+  ActivityIndicator
+} from "react-native";
 import {
   createDrawerNavigator,
   createStackNavigator,
   createBottomTabNavigator,
   createAppContainer,
-  createSwitchNavigator,
+  createSwitchNavigator
 } from "react-navigation";
 
 // shared routes
@@ -53,8 +58,8 @@ const store = createStore(
   {},
   compose(
     applyMiddleware(reduxThunk),
-    Reactotron.createEnhancer(),
-  ),
+    Reactotron.createEnhancer()
+  )
 );
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -74,45 +79,51 @@ const SignedInStack = createStackNavigator(
     ScheduleDetailsPage: props => <ScheduleDetailsPage {...props} />,
     InboxPage: props => <InboxPage {...props} />,
     InboxDetailsPage: props => <InboxDetailsPage {...props} />,
-    CheckInPage: props => <CheckInPage {...props} />,
+    CheckInPage: props => <CheckInPage {...props} />
   },
   {
     headerMode: "none",
     navigationOptions: {
-      headerVisible: false,
-    },
-  },
+      headerVisible: false
+    }
+  }
 );
 
 const LoginTabStackNavigator = createStackNavigator(
   {
     LoginPage,
-    SignUpPage,
+    SignUpPage
   },
   {
-    headerMode: "none",
-  },
+    headerMode: "none"
+  }
 );
 const AnonymousTabNavigator = createBottomTabNavigator(
   {
     SearchPage: {
       screen: SearchPage,
       navigationOptions: {
-        tabBarIcon: ({ tintColor }) => <Image style={{ tintColor }} source={searchIcon} />,
-      },
+        tabBarIcon: ({ tintColor }) => (
+          <Image style={{ tintColor }} source={searchIcon} />
+        )
+      }
     },
     HomePage: {
       screen: HomePage,
       navigationOptions: {
-        tabBarIcon: ({ tintColor }) => <Image style={{ tintColor }} source={homeIcon} />,
-      },
+        tabBarIcon: ({ tintColor }) => (
+          <Image style={{ tintColor }} source={homeIcon} />
+        )
+      }
     },
     LoginPage: {
       screen: LoginTabStackNavigator,
       navigationOptions: {
-        tabBarIcon: ({ tintColor }) => <Image style={{ tintColor }} source={loginIcon} />,
-      },
-    },
+        tabBarIcon: ({ tintColor }) => (
+          <Image style={{ tintColor }} source={loginIcon} />
+        )
+      }
+    }
   },
   {
     initialRouteName: "HomePage",
@@ -120,10 +131,23 @@ const AnonymousTabNavigator = createBottomTabNavigator(
       tabBarOptions: {
         activeTintColor: BLUE,
         inactiveTintColor: "#C3C3C3",
-        showLabel: false,
-      },
-    },
+        showLabel: false
+      }
+    }
+  }
+);
+
+const AnonymousStackNavigator = createStackNavigator(
+  {
+    HomePage: AnonymousTabNavigator,
+    MeetingPage
   },
+  {
+    headerMode: "none",
+    navigationOptions: {
+      headerVisible: false
+    }
+  }
 );
 
 const SignedInTabNavigator = createBottomTabNavigator(
@@ -131,41 +155,55 @@ const SignedInTabNavigator = createBottomTabNavigator(
     MeetingLoginPage: {
       screen: MeetingPage,
       navigationOptions: {
-        tabBarIcon: ({ tintColor }) => <Image style={{ tintColor }} source={homeIcon} />,
-      },
+        tabBarIcon: ({ tintColor }) => (
+          <Image style={{ tintColor }} source={homeIcon} />
+        )
+      }
     },
     InformationPage: {
       screen: InformationPage,
       navigationOptions: {
         tabBarIcon: ({ tintColor }) => (
-          <Image style={{ tintColor }} source={require("./src/assets/info_button.png")} />
-        ),
-      },
+          <Image
+            style={{ tintColor }}
+            source={require("./src/assets/info_button.png")}
+          />
+        )
+      }
     },
     InformationDetailsPage: {
       screen: InformationDetailsPage,
       navigationOptions: {
         tabBarIcon: ({ tintColor }) => (
-          <Image style={{ tintColor }} source={require("./src/assets/schedule_button.png")} />
-        ),
-      },
+          <Image
+            style={{ tintColor }}
+            source={require("./src/assets/schedule_button.png")}
+          />
+        )
+      }
     },
     InboxPage: {
       screen: InboxPage,
       navigationOptions: {
         tabBarIcon: ({ tintColor }) => (
-          <Image style={{ tintColor }} source={require("./src/assets/inbox_button.png")} />
-        ),
-      },
+          <Image
+            style={{ tintColor }}
+            source={require("./src/assets/inbox_button.png")}
+          />
+        )
+      }
     },
     CheckInPage: {
       screen: CheckInPage,
       navigationOptions: {
         tabBarIcon: ({ tintColor }) => (
-          <Image style={{ tintColor }} source={require("./src/assets/checkin_button.png")} />
-        ),
-      },
-    },
+          <Image
+            style={{ tintColor }}
+            source={require("./src/assets/checkin_button.png")}
+          />
+        )
+      }
+    }
   },
   {
     initialRouteName: "MeetingLoginPage",
@@ -173,33 +211,35 @@ const SignedInTabNavigator = createBottomTabNavigator(
       tabBarOptions: {
         activeTintColor: BLUE,
         inactiveTintColor: "#C3C3C3",
-        showLabel: false,
+        showLabel: false
       },
       tabBarOnPress: ({ navigation, defaultHandler }) => {
         const {
-          state: { routeName },
+          state: { routeName }
         } = navigation;
         const meetingId = navigation.getParam("meetingId");
         let params = {
           meetingId,
-          status: "loggedin",
+          status: "loggedin"
         };
         if (routeName === "MeetingLoginPage") {
           params = { ...params, content: "settings" };
         } else if (routeName === "InformationPage") {
           params = { ...params };
         } else if (routeName === "InformationDetailsPage") {
-          params = { ...params, status: "loggedin", content: "PERSONAL SCHEDULE" };
+          params = {
+            ...params,
+            status: "loggedin",
+            content: "PERSONAL SCHEDULE"
+          };
         } else if (routeName === "InboxPage") {
-          params = {};
-        } else if (routeName === "MeetingLoginPage") {
           params = {};
         }
         navigation.setParams(params);
         defaultHandler();
-      },
-    },
-  },
+      }
+    }
+  }
 );
 
 const SignedInStackNavigator = createStackNavigator(
@@ -210,35 +250,37 @@ const SignedInStackNavigator = createStackNavigator(
     UserPage,
     CalendarPage,
     NotificationPage,
+    ScheduleDetailsPage,
+    InboxDetailsPage
   },
   {
     headerMode: "none",
     navigationOptions: {
-      headerVisible: false,
-    },
-  },
+      headerVisible: false
+    }
+  }
 );
 
 const AnonymousDrawerNavigator = createDrawerNavigator(
   {
-    AnonymousTab: { screen: AnonymousTabNavigator },
+    AnonymousTab: { screen: AnonymousStackNavigator }
   },
   {
     drawerWidth: SCREEN_WIDTH * 0.8,
     contentComponent: SideMenu,
-    headerMode: "none",
-  },
+    headerMode: "none"
+  }
 );
 
 const SignedInDrawerNavigator = createDrawerNavigator(
   {
-    SignedInStack: { screen: SignedInStackNavigator },
+    SignedInStack: { screen: SignedInStackNavigator }
   },
   {
     drawerWidth: SCREEN_WIDTH * 0.8,
     contentComponent: SideMenu,
-    headerMode: "none",
-  },
+    headerMode: "none"
+  }
 );
 
 const AppStack = createAppContainer(
@@ -246,16 +288,16 @@ const AppStack = createAppContainer(
     {
       Anonymous: AnonymousDrawerNavigator,
       Signed: SignedInDrawerNavigator,
-      Splash: SplashPage,
+      Splash: SplashPage
     },
     {
       initialRouteName: "Splash",
       headerMode: "none",
       defaultNavigationOptions: {
-        headerMode: "none",
-      },
-    },
-  ),
+        headerMode: "none"
+      }
+    }
+  )
 );
 class App extends Component {
   componentDidMount() {

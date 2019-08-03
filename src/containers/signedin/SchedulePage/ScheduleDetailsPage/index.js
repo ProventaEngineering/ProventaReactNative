@@ -1,30 +1,43 @@
 import React, { Component } from "react";
-import { View, Text, ScrollView, Image, Linking, TouchableOpacity } from "react-native";
 import {
-  Header,
-  TabbedMenu,
-  Card,
-  ListItem
-} from "../../../../components";
+  View,
+  Text,
+  ScrollView,
+  Image,
+  Linking,
+  TouchableOpacity
+} from "react-native";
+import { Header, TabbedMenu, Card, ListItem } from "../../../../components";
 import PageStyle from "./styles";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 import * as actions from "../../../../actions";
 class ScheduleDetailsPage extends Component {
-
-  renderFacilitator(){
+  renderFacilitator() {
     const { navigation } = this.props;
     const event = navigation.getParam("event");
-    if( event.facilitator !== null && event.facilitator !== undefined ){
-      return(
-        <Card>
+    console.log({ event });
+    if (event && event.facilitator) {
+      const { facilitator } = event;
+      const {
+        full_name,
+        first_name,
+        last_name,
+        position,
+        company,
+        linkedin
+      } = facilitator;
+      return (
+        <Card key={event.id}>
           <View style={PageStyle.listContainer}>
             <ListItem>
               <View style={PageStyle.speakerContainer}>
                 <View>
-                  <Text style={PageStyle.title}>{event.facilitator.first_name + ' ' + event.facilitator.last_name}</Text>
-                  <Text style={PageStyle.text}>{event.facilitator.company + ' ' + event.facilitator.position}</Text>
+                  <Text style={PageStyle.title}>
+                    {full_name ? full_name : `${first_name} ${last_name}`}
+                  </Text>
+                  <Text style={PageStyle.text}>{`${company} ${position}`}</Text>
                 </View>
-                <TouchableOpacity onPress={() => Linking.openURL(event.facilitator.linkedin)}>
+                <TouchableOpacity onPress={() => Linking.openURL(linkedin)}>
                   <View style={PageStyle.linkedInContainer}>
                     <Image
                       style={PageStyle.linkedInButton}
@@ -32,14 +45,13 @@ class ScheduleDetailsPage extends Component {
                     />
                   </View>
                 </TouchableOpacity>
-
               </View>
             </ListItem>
           </View>
         </Card>
       );
-    }else{
-      return(
+    } else {
+      return (
         <Card>
           <View style={PageStyle.listContainer}>
             <ListItem>
@@ -51,17 +63,14 @@ class ScheduleDetailsPage extends Component {
         </Card>
       );
     }
-
   }
   renderEventDetails() {
     const { navigation } = this.props;
     const event = navigation.getParam("event");
-    if (event.topic !== null && event.topic !== undefined ) {
+    if (event.topic !== null && event.topic !== undefined) {
       return (
         <View>
-          <Text style={PageStyle.header}>
-            ABOUT
-          </Text>
+          <Text style={PageStyle.header}>ABOUT</Text>
           <Card>
             <View style={PageStyle.detailsContainer}>
               <Text style={PageStyle.title}>{event.topic}</Text>
@@ -71,50 +80,47 @@ class ScheduleDetailsPage extends Component {
         </View>
       );
     }
-
   }
 
-  renderLocation(){
+  renderLocation() {
     const { navigation } = this.props;
     const event = navigation.getParam("event");
-    if(event.floor_plan !== null && event.floor_plan !== undefined){
+    if (event && event.floor_plan && event.floor_plan.location) {
       return (
         <View>
-          <Text style={PageStyle.header}>
-            LOCATION
-          </Text>
+          <Text style={PageStyle.header}>LOCATION</Text>
           <Card>
             <View style={PageStyle.locationContainerStyle}>
               <View>
-                <Text style={PageStyle.title}>
-                  {event.floor_plan.location}
-                </Text>
+                <Text style={PageStyle.title}>{event.floor_plan.location}</Text>
               </View>
               <View>
-                <Image source={require("../../../../assets/checkin_button.png")} style={PageStyle.locationIconStyle} />
+                <Image
+                  source={require("../../../../assets/checkin_button.png")}
+                  style={PageStyle.locationIconStyle}
+                />
               </View>
             </View>
-            {event.floor_plan.image !== undefined && <Image source={event.floor_plan.image.url} style={PageStyle.mapImage} />}
-          </Card>
-        </View>
-      );
-    }else {
-      return (
-        <View>
-          <Text style={PageStyle.header}>
-            LOCATION
-          </Text>
-          <Card>
-            <View style={PageStyle.locationContainerStyle}>
-              <Text style={PageStyle.title}>
-                TBA
-              </Text>
-            </View>
+            {event.floor_plan.image ? (
+              <Image
+                source={event.floor_plan.image.url}
+                style={PageStyle.mapImage}
+              />
+            ) : null}
           </Card>
         </View>
       );
     }
-
+    return (
+      <View>
+        <Text style={PageStyle.header}>LOCATION</Text>
+        <Card>
+          <View style={PageStyle.locationContainerStyle}>
+            <Text style={PageStyle.title}>TBA</Text>
+          </View>
+        </Card>
+      </View>
+    );
   }
   render() {
     const { navigation } = this.props;
@@ -133,22 +139,23 @@ class ScheduleDetailsPage extends Component {
           {this.renderFacilitator()}
           {this.renderLocation()}
         </ScrollView>
-        <TabbedMenu status="loggedin" navigation={navigation} />
       </View>
     );
   }
 }
 
-
 const mapStatetoProps = ({ meetingsState, auth, userState }) => {
-  const { meeting,
-    hasLoadedMeeting
-  } = meetingsState;
+  const { meeting, hasLoadedMeeting } = meetingsState;
   const { meetings } = meetingsState;
   const { user } = userState;
   const { status, token } = auth;
   return {
-    meetings, meeting, hasLoadedMeeting, status, user, token
+    meetings,
+    meeting,
+    hasLoadedMeeting,
+    status,
+    user,
+    token
   };
 };
 

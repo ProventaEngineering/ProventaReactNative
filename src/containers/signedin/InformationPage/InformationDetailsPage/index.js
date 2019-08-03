@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Linking,
   ActivityIndicator,
-  AsyncStorage,
+  AsyncStorage
 } from "react-native";
 import { Header, TabbedMenu, Card, ListItem } from "../../../../components";
 import PageStyle from "./styles";
@@ -20,7 +20,7 @@ class InformationDetailsPage extends Component {
   getMeetingId = () => {
     const { navigation, user, meetings } = this.props;
     const meetingId = navigation.getParam("meetingId");
-    if (meetingId == undefined || meetingId == null) {
+    if (!meetingId) {
       if (user.profile.meetingIds.length > 0) {
         return user.profile.meetingIds[0];
       } else {
@@ -44,23 +44,30 @@ class InformationDetailsPage extends Component {
     const { navigation, meetings } = this.props;
     const meetingId = this.getMeetingId();
     const meeting = meetings.items[meetingId];
-    const facilitatorCopy = this.removeDuplicatesBy(x => x.id, meeting.facilitators);
+    const facilitatorCopy = this.removeDuplicatesBy(
+      x => x.id,
+      meeting.facilitators
+    );
     const facilitator = facilitatorCopy.map(
-      ({ id, first_name, last_name, company, position }, index, facilitators) => {
+      (
+        { id, first_name, last_name, company, position },
+        index,
+        facilitators
+      ) => {
         return (
           <View key={id} style={PageStyle.listContainer}>
             <ListItem
               onPress={() => {
                 this.setState(
                   {
-                    selectedIndex: index,
+                    selectedIndex: index
                   },
                   () => {
                     navigation.navigate("FacilitatorDetailsPage", {
                       facilitator: facilitators[index],
-                      meetingId: meetingId,
+                      meetingId: meetingId
                     });
-                  },
+                  }
                 );
               }}
             >
@@ -70,7 +77,7 @@ class InformationDetailsPage extends Component {
                     style={[PageStyle.listIcon, PageStyle.profileIcon]}
                     source={{
                       uri:
-                        "https://cdn5.vectorstock.com/i/thumb-large/13/04/male-profile-picture-vector-2041304.jpg",
+                        "https://cdn5.vectorstock.com/i/thumb-large/13/04/male-profile-picture-vector-2041304.jpg"
                     }}
                   />
                 </View>
@@ -88,17 +95,17 @@ class InformationDetailsPage extends Component {
             </ListItem>
           </View>
         );
-      },
+      }
     );
     return facilitator;
   }
 
   renderParticipants() {
-    const { navigation, meetings } = this.props;
+    const { meetings } = this.props;
     const meetingId = this.getMeetingId();
     const meeting = meetings.items[meetingId];
     const participant = meeting.participants.map(
-      ({ id, first_name, last_name, position, company, linkedin }, index, participants) => {
+      ({ id, first_name, last_name, position, company, linkedin }) => {
         return (
           <View key={id} style={PageStyle.listContainer}>
             <ListItem onPress={() => "pressed"}>
@@ -108,7 +115,7 @@ class InformationDetailsPage extends Component {
                     style={[PageStyle.listIcon, PageStyle.profileIcon]}
                     source={{
                       uri:
-                        "https://cdn5.vectorstock.com/i/thumb-large/13/04/male-profile-picture-vector-2041304.jpg",
+                        "https://cdn5.vectorstock.com/i/thumb-large/13/04/male-profile-picture-vector-2041304.jpg"
                     }}
                   />
                 </View>
@@ -133,16 +140,18 @@ class InformationDetailsPage extends Component {
             </ListItem>
           </View>
         );
-      },
+      }
     );
     return participant;
   }
 
   renderSponsors() {
-    const { navigation, meetings } = this.props;
+    const { meetings } = this.props;
+    const { items } = meetings || [];
     const meetingId = this.getMeetingId();
-    const meeting = meetings.items[meetingId];
-    const sponsor = meeting.sponsors.map(({ id, title, image, website }) => {
+    const meeting = items[meetingId];
+    const { sponsors = [] } = meeting || {};
+    const sponsor = sponsors.map(({ id, title, image, website }) => {
       return (
         <View key={id} style={{ width: "45%", alignItems: "flex-start" }}>
           <TouchableOpacity
@@ -161,20 +170,29 @@ class InformationDetailsPage extends Component {
   }
 
   renderPersonalSchedule() {
-    const { navigation, meetings } = this.props;
+    const { meetings } = this.props;
     const meetingId = this.getMeetingId();
     const meeting = meetings.items[meetingId];
 
-    const session = meeting.personalizeAgenda.schedules.map(({ subject, time }) => {
+    const session = meeting.personalizeAgenda.schedules.map(item => {
+      const { subject, time } = item;
       return (
-        <Card>
+        <Card key={subject.title}>
           <View style={PageStyle.listContainer}>
-            <ListItem>
+            <ListItem
+              onPress={() => {
+                this.props.navigation.navigate("ScheduleDetailsPage", {
+                  event: { ...subject, time },
+                  meetingId
+                });
+              }}
+            >
               <Text style={PageStyle.listTitle}> {subject.title} </Text>
               {subject.facilitator !== null ? (
                 <Text style={PageStyle.agendaDetails}>
                   {" "}
-                  {subject.facilitator.full_name} - {subject.facilitator.company}{" "}
+                  {subject.facilitator.full_name} -{" "}
+                  {subject.facilitator.company}{" "}
                 </Text>
               ) : null}
               {subject.floor_plan !== null ? (
@@ -183,7 +201,10 @@ class InformationDetailsPage extends Component {
                     style={PageStyle.agendaImage}
                     source={{ uri: subject.floor_plan.image.url }}
                   />
-                  <Text style={PageStyle.agendaDetails}> {subject.floor_plan.location} </Text>
+                  <Text style={PageStyle.agendaDetails}>
+                    {" "}
+                    {subject.floor_plan.location}{" "}
+                  </Text>
                 </View>
               ) : null}
               <View style={PageStyle.timeContainer}>
@@ -217,7 +238,9 @@ class InformationDetailsPage extends Component {
     } else if (content === "PERSONAL SCHEDULE") {
       return (
         <ScrollView>
-          <View style={PageStyle.agendaContainer}>{this.renderPersonalSchedule()}</View>
+          <View style={PageStyle.agendaContainer}>
+            {this.renderPersonalSchedule()}
+          </View>
         </ScrollView>
       );
     }
@@ -240,7 +263,7 @@ class InformationDetailsPage extends Component {
               } else {
                 navigation.navigate(route, {
                   meetingId: meetingId,
-                  status: "loggedin",
+                  status: "loggedin"
                 });
               }
             }}
@@ -249,20 +272,22 @@ class InformationDetailsPage extends Component {
                 navigation.navigate("SettingsPage", {
                   meetingId: meetingId,
                   content: "settings",
-                  previousRoute: "MeetingLoginPage",
+                  previousRoute: "MeetingLoginPage"
                 });
               }
             }}
           />
           {this.renderContent()}
-          <TabbedMenu navigation={navigation} status="loggedin" />
         </View>
       );
     } else {
       return (
         <View style={ComponentStyle.container}>
           <View style={PageStyle.loading}>
-            <ActivityIndicator loaded={meetings.hasMeetingsLoaded} size="large" />
+            <ActivityIndicator
+              loaded={meetings.hasMeetingsLoaded}
+              size="large"
+            />
           </View>
         </View>
       );
@@ -281,10 +306,10 @@ const mapStateToProps = ({ meetingsState, auth, userState }) => {
     hasLoadedMeeting,
     status,
     user,
-    token,
+    token
   };
 };
 export default connect(
   mapStateToProps,
-  { actions },
+  { actions }
 )(InformationDetailsPage);

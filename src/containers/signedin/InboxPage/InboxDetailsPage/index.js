@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import PageStyle from "./styles";
-import { Header, TabbedMenu, Card } from "../../../../components";
+import { Header, Card } from "../../../../components";
 class InboxDetailsPage extends Component {
   renderEmail() {
     const { navigation } = this.props;
@@ -9,7 +9,7 @@ class InboxDetailsPage extends Component {
     const date = navigation.getParam("date");
     const body = navigation.getParam("body");
     return (
-      <View>
+      <ScrollView>
         <Card>
           <View style={PageStyle.emailContainer}>
             <Text style={PageStyle.date}> {date} </Text>
@@ -18,7 +18,7 @@ class InboxDetailsPage extends Component {
             <Text style={PageStyle.body}> {body} </Text>
           </View>
         </Card>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -34,7 +34,6 @@ class InboxDetailsPage extends Component {
           }}
         />
         {this.renderEmail()}
-        <TabbedMenu navigation={navigation} status="loggedin" />
       </View>
     );
   }
