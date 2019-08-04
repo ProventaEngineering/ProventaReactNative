@@ -1,31 +1,40 @@
 import React, { Component } from "react";
-import { View, Image, TextInput } from "react-native";
+import { View, Image, TextInput, TouchableOpacity } from "react-native";
 import ComponentStyle from "./styles";
 
 const images = {
   visibilityIcon: require("../../assets/login_eye.png"),
   userIcon: require("../../assets/login_user.png"),
-  passwordIcon: require("../../assets/login_password.png"),
+  passwordIcon: require("../../assets/login_password.png")
 };
 
 class StyledInput extends Component {
-  renderRightIcon(type, onChangeText) {
+  renderRightIcon(type, onPress) {
     if (type === "email") {
       return (
         <View style={ComponentStyle.rightIcon}>
-          <Image style={[ComponentStyle.icon, { opacity: 0 }]} source={images.userIcon} />
+          <Image
+            style={[ComponentStyle.icon, { opacity: 0 }]}
+            source={images.userIcon}
+          />
         </View>
       );
     } else {
       return (
-        <View style={ComponentStyle.rightIcon}>
+        <TouchableOpacity style={ComponentStyle.rightIcon} onPress={onPress}>
           <Image style={[ComponentStyle.icon]} source={images.visibilityIcon} />
-        </View>
+        </TouchableOpacity>
       );
     }
   }
   render() {
-    const { type, onChangeText, placeholder } = this.props;
+    const {
+      type,
+      onChangeText,
+      placeholder,
+      onPressRightIcon,
+      secureTextEntry
+    } = this.props;
     return (
       <View style={ComponentStyle.searchSection}>
         <View style={ComponentStyle.leftIcon}>
@@ -39,13 +48,13 @@ class StyledInput extends Component {
             style={ComponentStyle.input}
             placeholder={placeholder}
             onChangeText={onChangeText}
-            secureTextEntry={type === "password"}
+            secureTextEntry={type === "password" && secureTextEntry}
             autoCapitalize="none"
             autoCompleteType="off"
             autoCorrect={false}
           />
         </View>
-        {this.renderRightIcon(type, placeholder, onChangeText)}
+        {this.renderRightIcon(type, onPressRightIcon)}
       </View>
     );
   }

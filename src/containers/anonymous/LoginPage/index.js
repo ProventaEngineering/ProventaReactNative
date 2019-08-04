@@ -6,28 +6,33 @@ import {
   Text,
   TouchableOpacity,
   AsyncStorage,
-  ActivityIndicator,
+  ActivityIndicator
 } from "react-native";
+
 import {
   Header,
   TabbedMenu,
   Card,
   StyledInput,
   MainButton,
-  SocialButton,
+  SocialButton
 } from "../../../components";
 import PageStyle from "./styles";
 import { DrawerActions } from "react-navigation";
 import { connect } from "react-redux";
-import { updateAuth, login, fetchProfile, fetchMeetings } from "../../../actions";
+import {
+  updateAuth,
+  login,
+  fetchProfile,
+  fetchMeetings
+} from "../../../actions";
 import { Google, AuthSession } from "expo";
-import { AuthAPI } from "../../../services";
-// import Expo from 'expo';
 const LINKEDIN_CLIENT_ID = "81opzafzg88o93";
 class LoginPage extends Component {
   state = {
     email: "",
     password: "",
+    visiblePassword: false
   };
   componentDidMount() {
     // this.syncUserWithStateAsync();
@@ -40,11 +45,22 @@ class LoginPage extends Component {
     if (token) {
       this.storeToken(token);
       if (status === "loggedin" && hasProfileLoaded && hasMeetingsLoaded) {
-        const meetingId = profile.meetingIds.count > 0 ? profile.meetingIds[0] : meetings.ids[0];
-        navigation.navigate("MeetingLoginPage", { status: "loggedin", meetingId: meetingId });
+        const meetingId =
+          profile.meetingIds.count > 0
+            ? profile.meetingIds[0]
+            : meetings.ids[0];
+        navigation.navigate("MeetingLoginPage", {
+          status: "loggedin",
+          meetingId: meetingId
+        });
       }
     }
   }
+  togglePasswordVisible = () =>
+    this.setState(prevState => ({
+      visiblePassword: !prevState.visiblePassword
+    }));
+
   onChangeText = type => value => this.setState({ [type]: value });
   syncUserWithStateAsync = async () => {
     const user = await Google.signInSilentlyAsync();
@@ -54,7 +70,8 @@ class LoginPage extends Component {
   loginWithGoogle = async () => {
     try {
       const result = await Google.logInAsync({
-        clientId: "6966997513-s5mroeevftu0i8l0a8rmm35c5cv9v12p.apps.googleusercontent.com",
+        clientId:
+          "6966997513-s5mroeevftu0i8l0a8rmm35c5cv9v12p.apps.googleusercontent.com"
       });
       if (result.type === "success") {
         return result.accessToken;
@@ -83,17 +100,17 @@ class LoginPage extends Component {
           `https://www.linkedin.com/oauth/v2/authorization?response_type=code` +
           `&client_id=${LINKEDIN_CLIENT_ID}` +
           `&redirect_uri=${encodeURIComponent(redirectUrl)}` +
-          `&scope=r_liteprofile%20r_emailaddress%20w_member_social`,
+          `&scope=r_liteprofile%20r_emailaddress%20w_member_social`
       });
       const {
-        params: { code },
+        params: { code }
       } = result;
 
       this.doLogin({
         code,
         client_id: LINKEDIN_CLIENT_ID,
         redirect_uri: redirectUrl,
-        type: "linkedin",
+        type: "linkedin"
       });
     } catch (error) {
       console.log("loginWithLinkedIn error", error);
@@ -140,7 +157,9 @@ class LoginPage extends Component {
         <StyledInput
           type="password"
           placeholder="Password"
+          secureTextEntry={!this.state.visiblePassword}
           onChangeText={this.onChangeText("password")}
+          onPressRightIcon={this.togglePasswordVisible}
         />
       </View>
     );
@@ -159,7 +178,10 @@ class LoginPage extends Component {
           <View style={ComponentStyle.container}>
             {loading ? (
               <View style={PageStyle.loading}>
-                <ActivityIndicator loaded={meetings.hasMeetingsLoaded} size="large" />
+                <ActivityIndicator
+                  loaded={meetings.hasMeetingsLoaded}
+                  size="large"
+                />
               </View>
             ) : (
               <View style={PageStyle.card}>
@@ -170,8 +192,12 @@ class LoginPage extends Component {
                 </View>
                 <View style={PageStyle.sectionLine} />
                 {this.renderSocialLinks()}
-                <Text style={PageStyle.signUpLabel}>Don't have an account?</Text>
-                <TouchableOpacity onPress={() => navigation.navigate("SignUpPage")}>
+                <Text style={PageStyle.signUpLabel}>
+                  Don't have an account?
+                </Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("SignUpPage")}
+                >
                   <Text style={PageStyle.signUpLink}> Sign up now </Text>
                 </TouchableOpacity>
               </View>
@@ -188,11 +214,20 @@ const mapStateToProps = ({ auth, userState, meetingsState }) => {
   const { status, message, emailAddress, password, token, loading } = auth;
   const { user } = userState;
   const { meetings } = meetingsState;
-  return { status, message, emailAddress, password, token, user, meetings, loading };
+  return {
+    status,
+    message,
+    emailAddress,
+    password,
+    token,
+    user,
+    meetings,
+    loading
+  };
 };
 
 const mapDispatchToProps = { login, updateAuth, fetchProfile, fetchMeetings };
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
+  mapDispatchToProps
 )(LoginPage);
