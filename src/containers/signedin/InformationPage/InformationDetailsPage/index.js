@@ -48,6 +48,8 @@ class InformationDetailsPage extends Component {
       x => x.id,
       meeting.facilitators
     );
+
+    const test = facilitatorCopy.map(data => data);
     const facilitator = facilitatorCopy.map(
       (
         { id, first_name, last_name, company, position },
@@ -128,12 +130,14 @@ class InformationDetailsPage extends Component {
                   </Text>
                 </View>
                 <View style={{ width: "25%" }}>
-                  <TouchableOpacity onPress={() => Linking.openURL(linkedin)}>
-                    <Image
-                      style={[PageStyle.linkedInButton]}
-                      source={require("../../../../assets/linkedin.png")}
-                    />
-                  </TouchableOpacity>
+                    <TouchableOpacity 
+                      disabled={linkedin == null || linkedin == ''? true : false } 
+                      onPress={() => Linking.openURL(linkedin)}>
+                      <Image
+                        style={[PageStyle.linkedInButton]}
+                        source={require("../../../../assets/linkedin.png")}
+                      />
+                    </TouchableOpacity>
                 </View>
               </View>
               <View style={PageStyle.listBorder} />
