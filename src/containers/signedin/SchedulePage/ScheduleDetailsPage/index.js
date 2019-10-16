@@ -37,7 +37,9 @@ class ScheduleDetailsPage extends Component {
                   </Text>
                   <Text style={PageStyle.text}>{`${company} ${position}`}</Text>
                 </View>
-                <TouchableOpacity onPress={() => Linking.openURL(linkedin)}>
+                <TouchableOpacity 
+                  disabled={linkedin == null || linkedin == '' ? true : false} 
+                  onPress={() => Linking.openURL(linkedin)}>
                   <View style={PageStyle.linkedInContainer}>
                     <Image
                       style={PageStyle.linkedInButton}
