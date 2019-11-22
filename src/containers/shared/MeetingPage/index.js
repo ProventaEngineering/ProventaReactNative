@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import {
   Header,
-  TabbedMenu,
   Card,
+  TabbedMenu,
   ListItem,
   Video,
   Map,
@@ -277,7 +277,7 @@ class MeetingPage extends Component {
     const { meetings, navigation } = this.props;
     const meetingId = navigation.getParam("meetingId");
     const meeting = meetings.items[meetingId];
-    if (this.state.status !== "loggedin")
+    //if (this.state.status !== "loggedin")
       return (
         <View>
           <Text style={PageStyle.header}> FACILITATORS </Text>

@@ -137,10 +137,49 @@ const AnonymousTabNavigator = createBottomTabNavigator(
   }
 );
 
+const MeetingDetailsTabNavigator = createBottomTabNavigator(
+  {
+    SearchPage: {
+      screen: SearchPage,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Image style={{ tintColor }} source={searchIcon} />
+        )
+      }
+    },
+    MeetingPage: {
+      screen: MeetingPage,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Image style={{ tintColor }} source={homeIcon} />
+        )
+      }
+    },
+    LoginPage: {
+      screen: LoginTabStackNavigator,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Image style={{ tintColor }} source={loginIcon} />
+        )
+      }
+    }
+  },
+  {
+    initialRouteName: "MeetingPage",
+    defaultNavigationOptions: {
+      tabBarOptions: {
+        activeTintColor: BLUE,
+        inactiveTintColor: "#C3C3C3",
+        showLabel: false
+      }
+    }
+  }
+);
+
 const AnonymousStackNavigator = createStackNavigator(
   {
     HomePage: AnonymousTabNavigator,
-    MeetingPage
+    MeetingPage: MeetingDetailsTabNavigator
   },
   {
     headerMode: "none",
